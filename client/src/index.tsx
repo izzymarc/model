@@ -7,10 +7,10 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 // Check for WebP support
-const checkWebPSupport = async () => {
+const checkWebPSupport = async (): Promise<boolean> => {
   const webP = new Image();
   webP.src = 'data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==';
-  return new Promise((resolve) => {
+  return new Promise<boolean>((resolve) => {
     webP.onload = webP.onerror = () => {
       resolve(webP.height === 1);
     };
