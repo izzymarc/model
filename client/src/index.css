@@ -732,3 +732,6 @@ input:focus, textarea:focus, select:focus {
   opacity: 0.5;
   filter: grayscale(100%);
 }
+
+/* Add Remix Icon via CDN */
+@import url('https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css');
