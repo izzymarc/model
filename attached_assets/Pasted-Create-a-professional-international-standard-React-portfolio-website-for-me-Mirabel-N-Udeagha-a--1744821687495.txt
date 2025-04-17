@@ -1,0 +1,40 @@
+Create a professional, international-standard React portfolio website for me, Mirabel N. Udeagha, a professional model. The website should showcase my modeling portfolio with the following specifications:
+
+1. Implement a modular, well-structured React architecture following industry best practices
+
+2. Feature an elegant, sophisticated responsive design that looks stunning on all devices and browsers
+
+3. Include internationalization (i18n) support for global reach with English as the primary language
+
+4. Ensure accessibility compliance (WCAG 2.1 AA standards) for all users worldwide
+
+CONTENT REQUIREMENTS:
+
+- Homepage: Feature a striking hero section with my name "Mirabel N. Udeagha" and a professional tagline such as "International Fashion & Editorial Model" with a prominent, full-width feature image and a call-to-action button to view my portfolio
+
+- About Me: Professional biography highlighting my experience, unique qualities, and modeling philosophy. Include details about my background, physical specifications (height, measurements), and career highlights
+
+- Portfolio: 
+  * Create a sophisticated gallery layout with filtering options by categories (Editorial, Commercial, Runway, Beauty, etc.)
+  * Include placeholder image spaces with proper image optimization
+  * Implement modal lightbox functionality for viewing full-sized images
+
+- Experience: Timeline of my modeling career showing agencies I've worked with, major campaigns, fashion shows, and editorial features
+
+- Services: Detail the types of modeling work I offer (fashion, commercial, editorial, promotional events, etc.)
+
+- Testimonials: Section for quotes from photographers, designers, and agencies I've worked with
+
+- Press: Feature magazine covers, interviews, and media appearances
+
+- Contact: Professional contact form and booking inquiry system with fields for project details, dates, budget range, and message
+
+Technical features should include:
+- Smooth page transitions and subtle animations that enhance the elegant aesthetic
+- Image lazy loading for optimal performance
+- Social media integration with Instagram feed
+- Light/dark mode toggle
+- Newsletter subscription option
+- Complete Netlify deployment configuration
+
+The design aesthetic should be sophisticated, minimalist, and fashion-forward with a color palette that complements model photography (neutral tones with one accent color). Typography should be elegant and contemporary.

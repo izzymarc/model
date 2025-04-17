@@ -1,0 +1,264 @@
+{
+  "meta": {
+    "title": "Mirabel N. Udeagha | International Fashion & Editorial Model",
+    "description": "Professional portfolio of Mirabel N. Udeagha, International Fashion & Editorial Model showcasing editorial, runway, commercial and beauty work."
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "portfolio": "Portfolio",
+    "experience": "Experience",
+    "press": "Press",
+    "contact": "Contact",
+    "modeling": "Modeling"
+  },
+  "hero": {
+    "name": "Mirabel N. Udeagha",
+    "tagline": "International Fashion & Editorial Model",
+    "profession": "Fashion Model",
+    "cta": "View Portfolio",
+    "contact": "Contact Me"
+  },
+  "about": {
+    "title": "About Me",
+    "subtitle": "About Me",
+    "connect": "Connect With Me",
+    "emailMe": "Email Me",
+    "quote": "My passion is to bring creative visions to life through fashion and editorial work.",
+    "paragraph1": "With over 7 years in the modeling industry, I've built a reputation for versatility and professionalism. My journey began in Lagos, Nigeria, before expanding to international markets including Paris, Milan, and New York.",
+    "paragraph2": "I specialize in high-fashion editorial work, runway shows, and commercial campaigns, with a particular strength in luxury and avant-garde fashion. My background in dance gives me a unique understanding of movement and form that translates into dynamic, expressive poses.",
+    "paragraph3": "I believe that great modeling is about collaboration and bringing creative visions to life through authentic expression and technical precision.",
+    "height": {
+      "label": "Height",
+      "value": "5'11\" / 180cm"
+    },
+    "hair": {
+      "label": "Hair",
+      "value": "Black"
+    },
+    "eyes": {
+      "label": "Eyes",
+      "value": "Brown"
+    },
+    "bust": {
+      "label": "Bust",
+      "value": "32\" / 81cm"
+    },
+    "waist": {
+      "label": "Waist",
+      "value": "24\" / 61cm"
+    },
+    "hips": {
+      "label": "Hips",
+      "value": "34\" / 86cm"
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "filters": {
+      "all": "All",
+      "editorial": "Editorial",
+      "runway": "Runway",
+      "commercial": "Commercial",
+      "beauty": "Beauty"
+    },
+    "loadMore": "Load More",
+    "items": {
+      "luxury": {
+        "title": "Luxury Beauty Campaign",
+        "description": "Fragrance Collection 2025"
+      },
+      "golden": {
+        "title": "Golden Hour Editorial",
+        "description": "Fashion Week Spotlight"
+      },
+      "contemporary": {
+        "title": "Contemporary Style",
+        "description": "Blue Marble Collection"
+      },
+      "executive": {
+        "title": "Executive Elegance",
+        "description": "Modern Business Collection"
+      },
+      "geometric": {
+        "title": "Geometric Dreams",
+        "description": "White Couture Series"
+      },
+      "scarlet": {
+        "title": "Scarlet Statement",
+        "description": "Haute Couture Showcase"
+      },
+      "fashion1": {
+        "title": "Modern Runway",
+        "description": "Paris Fashion Week 2024"
+      },
+      "fashion4": {
+        "title": "Luxury Couture",
+        "description": "Premium Fashion Editorial"
+      },
+      "fashion5": {
+        "title": "Vogue Editorial",
+        "description": "High Fashion Campaign 2025"
+      }
+    }
+  },
+  "experience": {
+    "title": "Experience",
+    "pfw": {
+      "title": "Paris Fashion Week",
+      "description": "Walked for Louis Vuitton and Chanel during the Spring/Summer collection shows, featured in Vogue's runway highlights."
+    },
+    "dior": {
+      "title": "Dior Campaign",
+      "description": "Featured in Dior's international print and digital campaign for their Fall/Winter collection, shot by renowned photographer Annie Leibovitz."
+    },
+    "elle": {
+      "title": "Elle Magazine Cover",
+      "description": "Featured on the cover of Elle Magazine's September issue, with a 10-page editorial spread discussing fashion and sustainability."
+    },
+    "nyfw": {
+      "title": "New York Fashion Week",
+      "description": "Opened for Michael Kors and closed for Marc Jacobs during NYFW, receiving significant media coverage for both appearances."
+    },
+    "img": {
+      "title": "Signed with IMG Models",
+      "description": "Joined the prestigious IMG Models agency, representing their New York, Paris, and Milan divisions."
+    }
+  },
+  "services": {
+    "title": "Services",
+    "inquire": "Inquire",
+    "fashion": {
+      "title": "Fashion & Editorial",
+      "description": "Professional modeling for high-fashion editorials, magazine features, and advertising campaigns across print and digital media."
+    },
+    "runway": {
+      "title": "Runway",
+      "description": "Experienced runway model for fashion shows, seasonal collections, and designer showcases at fashion weeks globally."
+    },
+    "commercial": {
+      "title": "Commercial",
+      "description": "Commercial modeling for brands, products, and services across television, digital media, and print advertisements."
+    },
+    "beauty": {
+      "title": "Beauty",
+      "description": "Specialized beauty modeling for cosmetics, skincare, haircare, and fragrance brands with a focus on facial features and expressions."
+    },
+    "video": {
+      "title": "Video & Motion",
+      "description": "Professional modeling for fashion films, promotional videos, social media content, and brand storytelling campaigns."
+    },
+    "events": {
+      "title": "Events & Appearances",
+      "description": "Professional appearances at fashion events, product launches, brand activations, and industry gatherings as a brand ambassador."
+    }
+  },
+  "testimonials": {
+    "title": "Testimonials",
+    "gucci": {
+      "quote": "Mirabel brings an extraordinary presence to the runway. Her ability to embody the essence of a collection and translate it through movement and expression is unparalleled. She's not just a model; she's a true artist."
+    },
+    "vogue": {
+      "quote": "Working with Mirabel is always a pleasure. She understands light, angles, and composition intuitively, making every shot effortlessly elegant."
+    },
+    "loreal": {
+      "quote": "Mirabel's professionalism and versatility make her a standout talent. She can transform from high fashion editorial to approachable commercial work with remarkable ease."
+    }
+  },
+  "press": {
+    "title": "Press",
+    "readArticle": "Read Article",
+    "vogue": {
+      "title": "Vogue Magazine",
+      "description": "Cover feature and exclusive interview discussing sustainable fashion and my journey in the modeling industry."
+    },
+    "harpers": {
+      "title": "Harper's Bazaar",
+      "description": "Featured in \"The Future of Fashion\" editorial, discussing emerging trends and the evolving modeling landscape."
+    },
+    "elle": {
+      "title": "Elle Magazine",
+      "description": "Interview feature on balancing international modeling career with advocacy for diversity in the fashion industry."
+    }
+  },
+  "instagram": {
+    "title": "Instagram",
+    "subtitle": "Follow my latest work and behind-the-scenes moments",
+    "followMe": "Follow on Instagram",
+    "viewPost": "View on Instagram",
+    "post": "Instagram post {{number}}"
+  },
+  "contact": {
+    "title": "Contact",
+    "getInTouch": "Get in Touch",
+    "intro": "For bookings, collaborations, or inquiries, please fill out the form or contact my agency directly.",
+    "followMe": "Follow Me",
+    "email": {
+      "title": "Email"
+    },
+    "phone": {
+      "title": "Phone"
+    },
+    "agency": {
+      "title": "Agency"
+    },
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "subject": "Subject",
+      "projectType": "Project Type",
+      "selectProjectType": "Select a project type",
+      "projectTypes": {
+        "editorial": "Editorial",
+        "commercial": "Commercial",
+        "runway": "Runway",
+        "event": "Event Appearance",
+        "other": "Other"
+      },
+      "projectDate": "Project Date",
+      "budgetRange": "Budget Range",
+      "selectBudget": "Select a budget range",
+      "budgetRanges": {
+        "below5k": "Below $5,000",
+        "5kTo10k": "$5,000 - $10,000",
+        "10kTo25k": "$10,000 - $25,000",
+        "above25k": "$25,000+"
+      },
+      "message": "Message",
+      "consent": "I consent to having this website store my submitted information so they can respond to my inquiry.",
+      "sendMessage": "Send Message",
+      "sending": "Sending..."
+    },
+    "success": {
+      "title": "Message Sent",
+      "message": "Thank you for your message. We'll get back to you as soon as possible."
+    },
+    "error": {
+      "title": "Error",
+      "message": "There was a problem sending your message. Please try again later."
+    }
+  },
+  "newsletter": {
+    "title": "Join My Newsletter",
+    "description": "Subscribe to my newsletter for updates on my latest projects, upcoming events, and exclusive content.",
+    "emailPlaceholder": "Your email address",
+    "subscribe": "Subscribe",
+    "subscribing": "Subscribing...",
+    "success": {
+      "title": "Subscription Successful",
+      "message": "Thank you for subscribing to my newsletter!"
+    },
+    "error": {
+      "title": "Subscription Error",
+      "message": "There was a problem with your subscription. Please try again later."
+    }
+  },
+  "footer": {
+    "tagline": "International Fashion & Editorial Model",
+    "navigation": "Navigation",
+    "contact": "Contact",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  }
+}

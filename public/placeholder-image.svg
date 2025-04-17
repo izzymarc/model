@@ -1,0 +1,9 @@
+<svg width="400" height="500" viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="500" fill="#F2F7FF"/>
+  <rect x="100" y="180" width="200" height="140" rx="8" fill="#E4E9F2"/>
+  <path d="M200 140C191.716 140 185 146.716 185 155C185 163.284 191.716 170 200 170C208.284 170 215 163.284 215 155C215 146.716 208.284 140 200 140Z" fill="#E4E9F2"/>
+  <path d="M160 220L180 190L200 240L240 190L280 220H160Z" fill="#D0D6E6"/>
+  <rect x="110" y="350" width="180" height="10" rx="5" fill="#E4E9F2"/>
+  <rect x="110" y="370" width="140" height="10" rx="5" fill="#E4E9F2"/>
+  <text x="200" y="430" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#A9B5D1">Image Unavailable Offline</text>
+</svg> 
