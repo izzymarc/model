@@ -271,5 +271,35 @@
       "sustainability": "Sustainability",
       "careerAdvice": "Career Advice"
     }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "navigation": {
+      "dashboard": "Dashboard",
+      "posts": "Posts",
+      "portfolio": "Portfolio",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "settings": {
+      "title": "Site Settings",
+      "general": "General",
+      "socialLinks": "Social Links",
+      "portfolioSettings": "Portfolio Settings",
+      "siteTitle": "Site Title",
+      "description": "Site Description",
+      "contactEmail": "Contact Email",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn",
+      "itemsPerPage": "Items Per Page",
+      "showCategories": "Show Categories",
+      "defaultCategory": "Default Category",
+      "save": "Save Settings",
+      "saving": "Saving...",
+      "saveSuccess": "Settings saved successfully!",
+      "saveError": "Error saving settings."
+    }
   }
 }
