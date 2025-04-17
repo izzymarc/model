@@ -255,6 +255,7 @@
   },
   "footer": {
     "tagline": "International Fashion & Editorial Model",
+    "description": "Professional Content Creator with a passion for creating authentic and engaging visual stories.",
     "navigation": "Navigation",
     "contact": "Contact",
     "rights": "All rights reserved.",
@@ -337,6 +338,37 @@
       "saving": "Saving...",
       "saveSuccess": "Settings saved successfully!",
       "saveError": "Error saving settings."
+    },
+    "blog": {
+      "title": "Blog Management",
+      "addNew": "Add New Post",
+      "preview": "Preview",
+      "edit": "Edit",
+      "delete": "Delete",
+      "createPost": "Create New Post",
+      "editPost": "Edit Post",
+      "postTitle": "Post Title",
+      "excerpt": "Excerpt",
+      "content": "Content",
+      "category": "Category",
+      "postStatus": "Status",
+      "publishDate": "Publish Date",
+      "featuredImage": "Featured Image URL",
+      "noPosts": "No blog posts yet. Create your first post!",
+      "status": {
+        "draft": "Draft",
+        "published": "Published"
+      },
+      "confirmDelete": "Are you sure you want to delete this post?",
+      "categories": {
+        "behindTheScenes": "Behind the Scenes",
+        "sustainability": "Sustainability",
+        "careerAdvice": "Career Advice"
+      }
     }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }
