@@ -2,14 +2,16 @@ import { Switch, Route } from "wouter";
 import { Suspense, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Toaster } from "./components/ui/toaster";
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Portfolio from "./pages/Portfolio";
-import Experience from "./pages/Experience";
-import Press from "./pages/Press";
-import Contact from "./pages/Contact";
-import Admin from "./pages/Admin";
-import NotFound from "./pages/not-found";
+import {
+  Home,
+  About,
+  Portfolio,
+  Experience,
+  Press,
+  Contact,
+  Admin,
+  NotFound
+} from "./pages";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import BackToTop from "./components/common/BackToTop";
