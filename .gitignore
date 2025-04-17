@@ -9,13 +9,23 @@ lerna-debug.log*
 
 # Dependencies
 node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+*.lcov
+
+# Build outputs
 dist
 dist-ssr
 *.local
+build
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 *.suo
@@ -31,17 +41,10 @@ dist-ssr
 .env.test.local
 .env.production.local
 
-# Build output
-build
-out
-
-# Coverage directory
-coverage
-
-# Cache
+# Misc
+temp
 .cache
-.temp
-.eslintcache
+.turbo
 
 server/public
 vite.config.ts.*
