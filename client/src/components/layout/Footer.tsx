@@ -84,7 +84,7 @@ const Footer = () => {
               Mirabel N. Udeagha
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mb-6">
-              {t('footer.description', 'Professional L Content Creator with a passion for creating authentic and engaging visual stories.')}
+              {t('footer.description', 'Professional Content Creator with a passion for creating authentic and engaging visual stories.')}
             </p>
             
             {/* Social Links */}
