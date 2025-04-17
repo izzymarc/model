@@ -56,6 +56,28 @@ npm run dev
 npm run build
 ```
 
+### Environment Variables
+
+The application uses environment variables for various configurations. Create a `.env` file in the `client` directory with the following variables:
+
+```
+# API Configuration
+VITE_API_URL=your_api_url
+
+# Authentication
+VITE_AUTH_SECRET=your_auth_secret_key
+
+# Third-party Services
+VITE_EMAILJS_SERVICE_ID=your_emailjs_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+VITE_EMAILJS_USER_ID=your_emailjs_user_id
+
+# Analytics (Optional)
+VITE_GA_TRACKING_ID=your_google_analytics_id
+```
+
+Note: Environment files (`.env`, `.env.local`) are excluded from git tracking for security purposes.
+
 ## Project Structure
 
 ```
