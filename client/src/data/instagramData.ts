@@ -40,41 +40,5 @@ export const instagramData: InstagramPost[] = [
     fallbackImage: "/images/fallback/fashion.jpg",
     link: "https://www.instagram.com/p/CqLUNz9NMGk/",
     caption: "Red carpet ready"
-  },
-  {
-    image: "/images/portfolio/fashion1.jpg",
-    fallbackImage: "/images/fallback/fashion.jpg",
-    link: "https://www.instagram.com/p/C9dF_NyLp3M/",
-    caption: "Paris Fashion Week highlights"
-  },
-  {
-    image: "/images/portfolio/fashion2.jpg",
-    fallbackImage: "/images/fallback/fashion.jpg",
-    link: "https://www.instagram.com/p/C8gHx2nLp1K/",
-    caption: "Milan runway moment"
-  },
-  {
-    image: "/images/portfolio/fashion4.jpg",
-    fallbackImage: "/images/fallback/fashion.jpg",
-    link: "https://www.instagram.com/p/C7jKl2mNp9B/",
-    caption: "Vogue editorial feature"
-  },
-  {
-    image: "/images/portfolio/fashion5.jpg",
-    fallbackImage: "/images/fallback/fashion.jpg",
-    link: "https://www.instagram.com/p/C6mN3oDLp7A/",
-    caption: "Haute couture campaign"
-  },
-  {
-    image: "/images/portfolio/whitedress.jpg",
-    fallbackImage: "/images/fallback/fashion.jpg",
-    link: "https://www.instagram.com/p/C5pQ5sSLp5Z/",
-    caption: "White collection shoot"
-  },
-  {
-    image: "/images/portfolio/reddress.jpg",
-    fallbackImage: "/images/fallback/fashion.jpg",
-    link: "https://www.instagram.com/p/C4sTt7fLp3Y/",
-    caption: "Red carpet event"
   }
 ];

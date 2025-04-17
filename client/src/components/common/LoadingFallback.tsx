@@ -1,16 +1,41 @@
-import React from 'react';
+import { motion } from 'framer-motion';
 
-const LoadingFallback: React.FC = () => {
+const LoadingFallback = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background text-foreground">
-      <div className="flex flex-col items-center">
-        <div className="relative w-20 h-20">
-          <div className="absolute top-0 left-0 right-0 bottom-0 rounded-full border-4 border-accent/30"></div>
-          <div className="absolute top-0 left-0 right-0 bottom-0 rounded-full border-4 border-t-accent animate-spin"></div>
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <motion.div
+        className="flex flex-col items-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-center space-x-2">
+          {[0, 1, 2].map((index) => (
+            <motion.div
+              key={index}
+              className="w-3 h-3 rounded-full bg-black dark:bg-white"
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.3, 1, 0.3]
+              }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+                repeatType: "loop",
+                delay: index * 0.2
+              }}
+            />
+          ))}
         </div>
-        <h2 className="mt-6 text-2xl font-playfair">Loading</h2>
-        <p className="mt-2 text-muted-foreground">Please wait while we prepare your experience...</p>
-      </div>
+        <motion.p
+          className="mt-4 text-sm text-gray-600 dark:text-gray-400"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          Loading...
+        </motion.p>
+      </motion.div>
     </div>
   );
 };

@@ -260,5 +260,16 @@
     "rights": "All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service"
+  },
+  "blog": {
+    "title": "Latest Articles",
+    "subtitle": "Insights, behind-the-scenes, and industry perspectives",
+    "readMore": "Read More",
+    "viewAll": "View All Articles",
+    "categories": {
+      "behindTheScenes": "Behind the Scenes",
+      "sustainability": "Sustainability",
+      "careerAdvice": "Career Advice"
+    }
   }
 }

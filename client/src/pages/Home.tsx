@@ -5,11 +5,13 @@ import Modeling from "@/components/home/Modeling";
 import Instagram from "@/components/home/Instagram";
 import Contact from "@/components/home/Contact";
 import SectionDivider from "@/components/common/SectionDivider";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Home = () => {
   const [location] = useLocation();
+  const homeRef = useRef<HTMLDivElement>(null);
 
   // Handle direct navigation to sections using URL hash
   useEffect(() => {
@@ -37,20 +39,49 @@ const Home = () => {
     }
   }, [location]);
 
+  // Animation variants
+  const pageVariants = {
+    initial: {
+      opacity: 0
+    },
+    animate: {
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        staggerChildren: 0.2
+      }
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 0.3
+      }
+    }
+  };
+
   return (
-    <div className="bg-white dark:bg-gray-900 text-black dark:text-white">
-      <Hero />
-      <SectionDivider type="wave" color="background" />
-      <Portfolio />
-      <SectionDivider type="angle" color="background" />
-      <Modeling />
-      <SectionDivider type="wave" color="background" />
-      <About />
-      <SectionDivider type="angle" color="background" />
-      <Instagram />
-      <SectionDivider type="wave" color="background" />
-      <Contact />
-    </div>
+    <AnimatePresence mode="wait">
+      <motion.div 
+        ref={homeRef}
+        className="bg-white dark:bg-gray-900 text-black dark:text-white"
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+      >
+        <Hero />
+        <SectionDivider type="wave" color="background" />
+        <Portfolio />
+        <SectionDivider type="angle" color="background" />
+        <Modeling />
+        <SectionDivider type="wave" color="background" />
+        <About />
+        <SectionDivider type="angle" color="background" />
+        <Instagram />
+        <SectionDivider type="wave" color="background" />
+        <Contact />
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
