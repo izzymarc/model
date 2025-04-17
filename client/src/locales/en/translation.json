@@ -274,12 +274,49 @@
   },
   "admin": {
     "title": "Admin Dashboard",
-    "navigation": {
-      "dashboard": "Dashboard",
-      "posts": "Posts",
-      "portfolio": "Portfolio",
-      "settings": "Settings",
-      "logout": "Logout"
+    "logout": "Logout",
+    "login": {
+      "title": "Admin Access",
+      "subtitle": "Enter your password to continue",
+      "password": "Password",
+      "passwordRequired": "Password is required",
+      "invalidPassword": "Invalid password",
+      "loginButton": "Login"
+    },
+    "nav": {
+      "images": "Images",
+      "settings": "Settings"
+    },
+    "images": {
+      "title": "Image Manager",
+      "uploadNew": "Upload New Image",
+      "selectFile": "Select Image File",
+      "altText": "Alt Text",
+      "altTextPlaceholder": "Describe the image for accessibility",
+      "category": "Category",
+      "caption": "Caption",
+      "captionPlaceholder": "Enter a caption for this image",
+      "upload": "Upload Image",
+      "uploading": "Uploading...",
+      "gallery": "Image Gallery",
+      "noImages": "No images uploaded yet. Add some images above.",
+      "edit": "Edit",
+      "delete": "Delete",
+      "editImage": "Edit Image",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "noFileSelected": "Please select an image file",
+      "uploadSuccess": "Image uploaded successfully",
+      "uploadError": "Error uploading image",
+      "deleteSuccess": "Image deleted successfully",
+      "updateSuccess": "Image updated successfully",
+      "confirmDelete": "Are you sure you want to delete this image?",
+      "categories": {
+        "fashion": "Fashion",
+        "editorial": "Editorial",
+        "commercial": "Commercial", 
+        "portrait": "Portrait"
+      }
     },
     "settings": {
       "title": "Site Settings",

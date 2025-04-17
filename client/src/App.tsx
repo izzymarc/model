@@ -8,6 +8,7 @@ import Portfolio from "@/pages/Portfolio";
 import Experience from "@/pages/Experience";
 import Press from "@/pages/Press";
 import Contact from "@/pages/Contact";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
@@ -63,6 +64,7 @@ function Router() {
         <Route path="/experience" component={Experience} />
         <Route path="/press" component={Press} />
         <Route path="/contact" component={Contact} />
+        <Route path="/admin" component={Admin} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
