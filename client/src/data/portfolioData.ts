@@ -1,4 +1,12 @@
-import { PortfolioItem } from "@/types";
+export interface PortfolioItem {
+  id: string;
+  titleKey: string;
+  descriptionKey: string;
+  category: "beauty" | "editorial" | "runway" | "commercial";
+  image: string;
+  year: number | string;
+  tags?: string[];
+}
 
 export const portfolioData: PortfolioItem[] = [
   {
@@ -6,36 +14,36 @@ export const portfolioData: PortfolioItem[] = [
     titleKey: "portfolio.items.luxury.title",
     descriptionKey: "portfolio.items.luxury.description",
     category: "beauty",
-    image: "/images/portfolio/perfume.jpg",
-    year: "2025",
-    tags: ["Beauty", "Campaign", "Luxury"]
+    image: "/images/portfolio/spring-collection.jpg",
+    year: 2024,
+    tags: ["beauty", "fragrance", "luxury"]
   },
   {
     id: "p2",
     titleKey: "portfolio.items.golden.title",
     descriptionKey: "portfolio.items.golden.description",
     category: "editorial",
-    image: "/images/portfolio/goldframe.jpg",
-    year: "2025",
-    tags: ["Editorial", "Fashion Week", "Gold"]
+    image: "/images/portfolio/summer-editorial.jpg",
+    year: 2024,
+    tags: ["editorial", "fashion-week", "print"]
   },
   {
     id: "p3",
     titleKey: "portfolio.items.contemporary.title",
     descriptionKey: "portfolio.items.contemporary.description",
     category: "commercial",
-    image: "/images/portfolio/blueoutfit.jpg",
-    year: "2024",
-    tags: ["Commercial", "Outdoor", "Summer"]
+    image: "/images/portfolio/fashion2.jpg",
+    year: 2023,
+    tags: ["commercial", "catalog", "contemporary"]
   },
   {
     id: "p4",
     titleKey: "portfolio.items.executive.title",
     descriptionKey: "portfolio.items.executive.description",
-    category: "editorial",
-    image: "/images/portfolio/businessattire.jpg",
-    year: "2024",
-    tags: ["Editorial", "Business", "Professional"]
+    category: "commercial",
+    image: "/images/portfolio/elegant-pose.jpg",
+    year: 2023,
+    tags: ["commercial", "business", "professional"]
   },
   {
     id: "p5",
@@ -43,17 +51,17 @@ export const portfolioData: PortfolioItem[] = [
     descriptionKey: "portfolio.items.geometric.description",
     category: "editorial",
     image: "/images/portfolio/whitedress.jpg",
-    year: "2023",
-    tags: ["Editorial", "Couture", "Minimalist"]
+    year: 2023,
+    tags: ["editorial", "couture", "avant-garde"]
   },
   {
     id: "p6",
     titleKey: "portfolio.items.scarlet.title",
     descriptionKey: "portfolio.items.scarlet.description",
-    category: "beauty",
+    category: "runway",
     image: "/images/portfolio/reddress.jpg",
-    year: "2023",
-    tags: ["Beauty", "Haute Couture", "Evening"]
+    year: 2022,
+    tags: ["runway", "haute-couture", "statement"]
   },
   {
     id: "p7",

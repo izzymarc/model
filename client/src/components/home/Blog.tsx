@@ -1,131 +1,95 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import LazyImage from '../common/LazyImage';
+import { Link } from 'wouter';
+import { blogPosts } from '../../data/blogData';
 
-// Sample blog data - in a real app, this would come from an API or CMS
-const blogPosts = [
-  {
-    id: 1,
-    title: 'Behind the Scenes: Fashion Week 2024',
-    excerpt: 'An inside look at the preparation, challenges, and highlights of Fashion Week 2024.',
-    date: '2024-03-15',
-    image: '/images/blog/fashion-week.jpg',
-    category: 'behindTheScenes',
-    readTime: '5 min read',
-  },
-  {
-    id: 2,
-    title: 'Sustainable Fashion: My Journey',
-    excerpt: 'How I\'ve incorporated sustainable fashion practices into my content creation and personal life.',
-    date: '2024-02-22',
-    image: '/images/blog/sustainable-fashion.jpg',
-    category: 'sustainability',
-    readTime: '4 min read',
-  },
-  {
-    id: 3,
-    title: 'Tips for Aspiring Content Creators',
-    excerpt: 'Essential advice for those looking to break into the content creation industry.',
-    date: '2024-01-10',
-    image: '/images/blog/modeling-tips.jpg',
-    category: 'careerAdvice',
-    readTime: '6 min read',
-  },
-];
-
-const Blog = () => {
+const Blog: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  
+  // Get only published posts and sort by date (most recent first)
+  const recentPosts = blogPosts
+    .filter(post => post.status === 'published')
+    .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
+    .slice(0, 3); // Show only the 3 most recent posts
 
   return (
-    <section id="blog" className="py-20 bg-background">
+    <section className="py-16 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('blog.title')}</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            {t('blog.subtitle')}
-          </p>
-        </motion.div>
+        <div className="text-center mb-12">
+          <motion.h2 
+            className="text-3xl md:text-4xl font-heading mb-3"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            {t('blog.title', 'Latest Articles')}
+          </motion.h2>
+          <motion.p
+            className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            {t('blog.subtitle', 'Insights, behind-the-scenes, and industry perspectives')}
+          </motion.p>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogPosts.map((post, index) => (
-            <motion.article
+          {recentPosts.map((post, index) => (
+            <motion.div 
               key={post.id}
-              initial={{ opacity: 0, y: 20 }}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden"
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <div className="relative aspect-[16/9] overflow-hidden">
-                <LazyImage
-                  src={post.image}
+              <div className="h-56 overflow-hidden">
+                <img 
+                  src={post.featuredImage} 
                   alt={post.title}
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                  aspectRatio="aspect-[16/9]"
+                  className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute top-4 left-4 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full">
-                  {t(`blog.categories.${post.category}`)}
-                </div>
               </div>
               <div className="p-6">
-                <div className="flex items-center text-sm text-muted-foreground mb-2">
-                  <span>{format(new Date(post.date), 'MMMM d, yyyy')}</span>
-                  <span className="mx-2">•</span>
-                  <span>{post.readTime}</span>
-                </div>
-                <h3 className="text-xl font-semibold mb-2 line-clamp-2 hover:text-primary transition-colors">
+                <span className="inline-block px-3 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 rounded-full mb-3">
+                  {t(`blog.categories.${post.category}`)}
+                </span>
+                <h3 className="text-xl font-medium mb-3 line-clamp-2">
                   {post.title}
                 </h3>
-                <p className="text-muted-foreground mb-4 line-clamp-3">{post.excerpt}</p>
-                <button
-                  onClick={() => navigate(`/blog/${post.id}`)}
-                  className="inline-flex items-center text-primary hover:underline font-medium"
-                >
-                  {t('blog.readMore')}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 ml-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
+                  {post.excerpt}
+                </p>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-500">
+                    {new Date(post.publishDate).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </span>
+                  <Link href={`/blog/${post.slug}`}>
+                    <a className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium">
+                      {t('blog.readMore', 'Read More')}
+                    </a>
+                  </Link>
+                </div>
               </div>
-            </motion.article>
+            </motion.div>
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center mt-12"
-        >
-          <button
-            onClick={() => navigate('/blog')}
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
-          >
-            {t('blog.viewAll')}
-          </button>
-        </motion.div>
+        <div className="text-center mt-12">
+          <Link href="/blog">
+            <a className="inline-block bg-black text-white dark:bg-white dark:text-black py-3 px-8 rounded-full hover:bg-gray-900 dark:hover:bg-gray-200 transition duration-300">
+              {t('blog.viewAll', 'View All Articles')}
+            </a>
+          </Link>
+        </div>
       </div>
     </section>
   );

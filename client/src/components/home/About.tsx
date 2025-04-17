@@ -45,13 +45,11 @@ const About = () => {
             transition={{ duration: 0.6 }}
           >
             <div className="relative">
-              <LazyImage
-                src="/images/about.jpeg"
+              <img
+                src="https://i.imgur.com/U2IJ1Su.jpg"
                 alt={t('about.imageAlt', 'Mirabel N. Udeagha portrait')}
-                className="w-full h-auto"
-                aspectRatio="aspect-ratio-3/2"
-                objectFit="cover"
-                objectPosition="center"
+                className="w-full h-auto rounded-md shadow-md object-cover"
+                loading="eager"
               />
             </div>
           </motion.div>

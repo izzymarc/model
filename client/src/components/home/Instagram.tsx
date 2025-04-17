@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { instagramData } from '../../data/instagramData';
+import { instagramPosts } from '../../data/instagramData';
 import LazyImage from '../common/LazyImage';
 
 const Instagram: React.FC = () => {
@@ -54,7 +54,7 @@ const Instagram: React.FC = () => {
           viewport={{ once: true, margin: "-50px" }}
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6"
         >
-          {instagramData.map((post, index) => (
+          {instagramPosts.map((post, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
@@ -67,7 +67,7 @@ const Instagram: React.FC = () => {
               }}
             >
               <a
-                href={post.link}
+                href={post.postUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full h-full"
@@ -76,7 +76,6 @@ const Instagram: React.FC = () => {
                 <LazyImage
                   src={post.image}
                   alt={post.caption || t('instagram.post', 'Instagram post {{number}}', { number: index + 1 })}
-                  fallbackImage={post.fallbackImage}
                   className="w-full h-full"
                   aspectRatio="aspect-[4/5]"
                   objectFit="cover"
