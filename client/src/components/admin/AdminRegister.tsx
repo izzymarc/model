@@ -3,24 +3,36 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 
-interface AdminLoginProps {
-  onLogin: () => void;
-  onSwitchToRegister: () => void;
+interface AdminRegisterProps {
+  onRegister: () => void;
+  onSwitchToLogin: () => void;
 }
 
-const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) => {
+const AdminRegister: React.FC<AdminRegisterProps> = ({ onRegister, onSwitchToLogin }) => {
   const { t } = useTranslation();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
-      setError(t('admin.login.emptyFields', 'Please enter both email and password'));
+    if (!email || !password || !name) {
+      setError(t('admin.register.emptyFields', 'Please fill in all required fields'));
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError(t('admin.register.passwordMismatch', 'Passwords do not match'));
+      return;
+    }
+
+    if (password.length < 6) {
+      setError(t('admin.register.passwordTooShort', 'Password must be at least 6 characters'));
       return;
     }
     
@@ -28,16 +40,19 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
     setError('');
     
     try {
-      const { success, error } = await login(email, password);
+      const { success, error } = await register(email, password, {
+        name: name,
+        role: 'admin'
+      });
       
       if (success) {
-        onLogin();
+        onRegister();
       } else {
-        setError(error || t('admin.login.invalidCredentials', 'Invalid email or password'));
+        setError(error || t('admin.register.error', 'Registration failed'));
         setIsLoading(false);
       }
     } catch (err) {
-      setError(t('admin.login.error', 'An error occurred during login'));
+      setError(t('admin.register.error', 'An error occurred during registration'));
       setIsLoading(false);
     }
   };
@@ -58,10 +73,10 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
         >
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-              {t('admin.login.title', 'Admin Login')}
+              {t('admin.register.title', 'Create Admin Account')}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('admin.login.subtitle', 'Enter your credentials to access the admin panel')}
+              {t('admin.register.subtitle', 'Register to access the admin panel')}
             </p>
           </div>
           
@@ -77,8 +92,22 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
           
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
+              <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="name">
+                {t('admin.register.name', 'Full Name')}
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder={t('admin.register.namePlaceholder', 'Enter your full name')}
+              />
+            </div>
+            
+            <div className="mb-4">
               <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="email">
-                {t('admin.login.email', 'Email')}
+                {t('admin.register.email', 'Email')}
               </label>
               <input
                 id="email"
@@ -86,13 +115,13 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder={t('admin.login.emailPlaceholder', 'Enter your email')}
+                placeholder={t('admin.register.emailPlaceholder', 'Enter your email')}
               />
             </div>
             
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="password">
-                {t('admin.login.password', 'Password')}
+                {t('admin.register.password', 'Password')}
               </label>
               <input
                 id="password"
@@ -100,7 +129,21 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder={t('admin.login.passwordPlaceholder', '••••••••')}
+                placeholder={t('admin.register.passwordPlaceholder', '••••••••')}
+              />
+            </div>
+            
+            <div className="mb-6">
+              <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="confirmPassword">
+                {t('admin.register.confirmPassword', 'Confirm Password')}
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder={t('admin.register.confirmPasswordPlaceholder', '••••••••')}
               />
             </div>
             
@@ -118,31 +161,24 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {t('admin.login.loggingIn', 'Logging in...')}
+                    {t('admin.register.registering', 'Registering...')}
                   </div>
                 ) : (
-                  t('admin.login.submit', 'Login')
+                  t('admin.register.submit', 'Register')
                 )}
               </button>
               
-              <div className="flex justify-between items-center">
-                <a 
-                  href="#" 
-                  className="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // Implement password reset functionality
-                  }}
-                >
-                  {t('admin.login.forgotPassword', 'Forgot password?')}
-                </a>
-                
-                <button
+              <div className="text-center text-sm">
+                <span className="text-gray-600 dark:text-gray-400">
+                  {t('admin.register.alreadyHaveAccount', 'Already have an account?')}
+                </span>
+                {' '}
+                <button 
                   type="button"
-                  onClick={onSwitchToRegister}
-                  className="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                  onClick={onSwitchToLogin}
+                  className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 focus:outline-none"
                 >
-                  {t('admin.login.createAccount', 'Create account')}
+                  {t('admin.register.login', 'Login')}
                 </button>
               </div>
             </div>
@@ -150,11 +186,11 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
         </motion.div>
         
         <p className="text-center text-gray-500 dark:text-gray-400 text-xs">
-          {t('admin.login.demoNote', 'Use your Supabase credentials to log in')}
+          {t('admin.register.securityNote', 'Password must be at least 6 characters long')}
         </p>
       </div>
     </motion.div>
   );
 };
 
-export default AdminLogin; 
+export default AdminRegister; 

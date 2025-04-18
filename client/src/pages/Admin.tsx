@@ -1,25 +1,44 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import {
-  AdminNav,
-  AdminLogin,
-  ImageManager,
-  SettingsPanel,
-  DashboardPanel,
-  PortfolioManager,
-  ExperienceManager,
-  PressManager,
-  BlogManager
-} from '../components/admin';
+import AdminNav from '../components/admin/AdminNav';
+import AdminLogin from '../components/admin/AdminLogin';
+import AdminRegister from '../components/admin/AdminRegister';
+import ImageManager from '../components/admin/ImageManager';
+import MediaManager from '../components/admin/MediaManager';
+import SettingsPanel from '../components/admin/SettingsPanel';
+import DashboardPanel from '../components/admin/DashboardPanel';
+import PortfolioManager from '../components/admin/PortfolioManager';
+import BlogManager from '../components/admin/BlogManager';
+import ProfileManager from '../components/admin/ProfileManager';
+import { useAuth } from '../contexts/AuthContext';
 
 const Admin: React.FC = () => {
   const { t } = useTranslation();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated, isLoading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [showRegister, setShowRegister] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
-    return <AdminLogin onLogin={() => setIsAuthenticated(true)} />;
+    return showRegister ? (
+      <AdminRegister 
+        onRegister={() => {}} 
+        onSwitchToLogin={() => setShowRegister(false)} 
+      />
+    ) : (
+      <AdminLogin 
+        onLogin={() => {}} 
+        onSwitchToRegister={() => setShowRegister(true)}
+      />
+    );
   }
 
   const renderActiveTab = () => {
@@ -28,14 +47,14 @@ const Admin: React.FC = () => {
         return <DashboardPanel />;
       case 'images':
         return <ImageManager />;
+      case 'media':
+        return <MediaManager />;
       case 'portfolio':
         return <PortfolioManager />;
-      case 'experience':
-        return <ExperienceManager />;
-      case 'press':
-        return <PressManager />;
       case 'blog':
         return <BlogManager />;
+      case 'profile':
+        return <ProfileManager />;
       case 'settings':
         return <SettingsPanel />;
       default:
@@ -51,7 +70,7 @@ const Admin: React.FC = () => {
             {t('admin.title', 'Admin Panel')}
           </h1>
           <button
-            onClick={() => setIsAuthenticated(false)}
+            onClick={logout}
             className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
             {t('admin.logout', 'Logout')}
