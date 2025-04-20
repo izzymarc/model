@@ -15,8 +15,8 @@ A modern, responsive portfolio website built with React, TypeScript, and Tailwin
 - 🎯 Smooth scrolling
 - 📧 Contact form
 - 📱 Social media integration
-- 🔒 Authentication with Supabase
-- 💾 Database and storage with Supabase
+- 🔒 Authentication with Firebase
+- 💾 Database and storage with Firebase
 - 👤 User registration and admin panel
 
 ## Tech Stack
@@ -28,15 +28,15 @@ A modern, responsive portfolio website built with React, TypeScript, and Tailwin
 - i18next
 - React Router
 - Vite
-- Supabase (Auth, Database, Storage)
+- Firebase (Auth, Database, Storage)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v18.x)
 - npm or yarn
-- Supabase account (for backend services)
+- Firebase account (for backend services)
 
 ### Installation
 
@@ -51,12 +51,12 @@ cd model
 npm install
 ```
 
-3. Set up Supabase:
-   - Create a new project on [Supabase](https://supabase.com)
-   - Use the SQL schema file in `client/src/utils/schema.sql` to set up all necessary tables
-   - Create storage buckets for media files
-   - Configure authentication providers (Email/Password by default)
-   - Add your Supabase URL and anon key to the `.env` file
+3. Set up Firebase:
+   - Create a new project on [Firebase](https://firebase.google.com)
+   - Set up Firebase Authentication (Email/Password)
+   - Create Firestore collections for portfolio, blog posts, etc.
+   - Configure Firebase Storage for media files
+   - Add your Firebase configuration to the `.env` file
 
 4. Start the development server:
 ```bash
@@ -73,9 +73,14 @@ npm run build
 The application uses environment variables for various configurations. Create a `.env` file in the root directory with the following variables:
 
 ```
-# Supabase Configuration
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
 # API Configuration
 VITE_API_URL=/api
@@ -96,7 +101,7 @@ Note: Environment files (`.env`, `.env.local`) are excluded from git tracking fo
 
 ## Authentication and User Management
 
-This project uses Supabase Authentication for user management. The implementation includes:
+This project uses Firebase Authentication for user management. The implementation includes:
 
 1. **User Registration**: New users can register with email and password through the AdminRegister component.
 2. **User Login**: Registered users can log in to access the admin panel.
@@ -111,85 +116,76 @@ To set up the first admin user:
 3. Enter your email, name, and password
 4. The first user created will automatically be granted admin privileges
 
-For security reasons, you may want to disable public registration after creating the initial admin account by modifying the Supabase authentication settings.
+For security reasons, you may want to disable public registration after creating the initial admin account by modifying the Firebase Authentication settings.
 
-## Database Schema
+## Database Structure
 
-The complete database schema is available in the `client/src/utils/schema.sql` file. This file includes:
+The application uses Firebase Firestore with the following collections:
 
-- Tables for profiles, portfolio items, blog posts, media, contact submissions, and site settings
-- Row-level security policies for each table
-- Database triggers for user registration
-- Default data for site settings
+### Core Collections
 
-### Core Tables
-
-#### Profiles Table
-```sql
-CREATE TABLE IF NOT EXISTS profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
-  name TEXT,
-  title TEXT,
-  bio TEXT,
-  email TEXT UNIQUE,
-  -- additional fields...
-  role TEXT DEFAULT 'user',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+#### Users Collection
+```javascript
+{
+  uid: string, // Firebase Auth user ID
+  displayName: string,
+  email: string,
+  role: string, // 'admin' or 'user'
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
 ```
 
-#### Portfolio Table
-```sql
-CREATE TABLE IF NOT EXISTS portfolio (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  title TEXT NOT NULL,
-  description TEXT,
-  image_url TEXT,
-  category TEXT,
-  year INT,
-  tags TEXT[],
-  is_published BOOLEAN DEFAULT true,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+#### Portfolio Collection
+```javascript
+{
+  id: string,
+  title: string,
+  description: string,
+  imageUrl: string,
+  category: string,
+  year: number,
+  tags: array,
+  isPublished: boolean,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
 ```
 
-#### Blog Posts Table
-```sql
-CREATE TABLE IF NOT EXISTS blog_posts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  title TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  content TEXT,
-  excerpt TEXT,
-  image_url TEXT,
-  author_id UUID REFERENCES auth.users ON DELETE CASCADE,
-  category TEXT,
-  tags TEXT[],
-  is_published BOOLEAN DEFAULT false,
-  published_at TIMESTAMP WITH TIME ZONE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+#### Blog Posts Collection
+```javascript
+{
+  id: string,
+  title: string,
+  slug: string,
+  content: string,
+  excerpt: string,
+  imageUrl: string,
+  authorId: string, // Reference to users collection
+  category: string,
+  tags: array,
+  isPublished: boolean,
+  publishedAt: timestamp,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
 ```
 
-## Supabase Integration
+## Firebase Integration
 
-This project uses Supabase for backend services:
+This project uses Firebase for backend services:
 
-1. **Authentication**: User registration, login/logout, and profile management are handled by Supabase Auth.
-2. **Database**: Portfolio items, blog posts, user profiles, and other data are stored in Supabase PostgreSQL database.
-3. **Storage**: Media files (images, videos) are uploaded to and served from Supabase Storage.
-4. **Row-Level Security**: Database access is controlled through policies based on user roles.
+1. **Authentication**: User registration, login/logout, and profile management are handled by Firebase Auth.
+2. **Database**: Portfolio items, blog posts, user profiles, and other data are stored in Firebase Firestore.
+3. **Storage**: Media files (images, videos) are uploaded to and served from Firebase Storage.
+4. **Security Rules**: Database and storage access is controlled through Firebase security rules based on user roles.
 
-To set up your project with Supabase:
+To set up your project with Firebase:
 
-1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Use the SQL editor to execute the schema file at `client/src/utils/schema.sql`
-3. Create a storage bucket named "media" with public read access
-4. Set up email/password authentication in the Authentication settings
-5. Add your URL and anon key to the `.env` file
+1. Create a Firebase project at [firebase.google.com](https://firebase.google.com)
+2. Set up Authentication, Firestore, and Storage services
+3. Configure security rules for Firestore and Storage
+4. Add your Firebase configuration to the `.env` file
 
 ## Project Structure
 
@@ -208,11 +204,11 @@ To set up your project with Supabase:
 │   │   ├── contexts/        # React contexts including AuthContext
 │   │   ├── data/
 │   │   ├── hooks/
-│   │   ├── lib/
+│   │   ├── lib/             # Firebase configuration
 │   │   ├── locales/
 │   │   ├── pages/
-│   │   ├── services/        # Supabase service functions
-│   │   ├── utils/           # Utilities including Supabase client
+│   │   ├── services/        # Firebase service functions
+│   │   ├── utils/           # Utility functions
 │   │   └── ...
 │   └── ...
 └── ...
@@ -220,7 +216,7 @@ To set up your project with Supabase:
 
 ## Deployment
 
-This project is configured for deployment on Netlify. Simply connect your GitHub repository to Netlify and it will automatically deploy your site.
+This project is configured for deployment on Netlify or Firebase Hosting. 
 
 ### Netlify Configuration
 
@@ -236,6 +232,16 @@ The project includes a `netlify.toml` file with the following settings:
   to = "/index.html"
   status = 200
 ```
+
+### Firebase Hosting
+
+To deploy to Firebase Hosting:
+
+1. Install Firebase CLI: `npm install -g firebase-tools`
+2. Login to Firebase: `firebase login`
+3. Initialize Firebase: `firebase init` (select Hosting)
+4. Build the project: `npm run build`
+5. Deploy to Firebase: `firebase deploy`
 
 ## Contributing
 
