@@ -1,34 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { RecentActivity, DashboardStats } from '@/types';
+import { DashboardStats, RecentActivity } from '@/types';
 
 // Placeholder for chart component - in a real application, you would use a library like recharts
-const UsageChart: React.FC = () => {
+const UsageChart = () => {
   return (
-    <div className="relative pt-6">
-      <div className="absolute top-0 left-0 w-full text-xs flex justify-between px-2">
-        <span>Jan</span>
-        <span>Feb</span>
-        <span>Mar</span>
-        <span>Apr</span>
-        <span>May</span>
-        <span>Jun</span>
-      </div>
-      <div className="h-40 flex items-end justify-between">
-        {[35, 48, 30, 45, 65, 72].map((value, index) => (
-          <div key={index} className="w-full mx-0.5">
-            <div 
-              className="bg-indigo-500 dark:bg-indigo-600 rounded-t-sm hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-all cursor-pointer group relative"
-              style={{ height: `${value}%` }}
-            >
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                {value}%
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="w-full h-64 bg-gray-100 rounded flex items-center justify-center">
+      <p className="text-gray-500">Usage Chart Placeholder</p>
     </div>
   );
 };
@@ -64,34 +43,53 @@ const DashboardPanel: React.FC = () => {
   
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([
     {
-      id: 1,
+      id: '1',
       type: 'portfolio',
-      action: 'added',
-      item: 'Portfolio Item: Paris Fashion Week',
-      user: 'Admin',
-      timestamp: new Date(Date.now() - 3600000),
+      action: 'create',
+      item: {
+        id: '101',
+        title: 'Portfolio Item: Paris Fashion Week'
+      },
+      user: {
+        id: '1',
+        name: 'Admin'
+      },
+      timestamp: new Date(Date.now() - 3600000)
     },
     {
-      id: 2,
+      id: '2',
       type: 'blog',
-      action: 'updated',
-      item: 'Blog Post: Behind the Scenes',
-      user: 'Admin',
-      timestamp: new Date(Date.now() - 86400000),
+      action: 'update',
+      item: {
+        id: '102',
+        title: 'Blog Post: Behind the Scenes'
+      },
+      user: {
+        id: '1',
+        name: 'Admin'
+      },
+      timestamp: new Date(Date.now() - 86400000)
     },
     {
-      id: 3,
-      type: 'media',
-      action: 'uploaded',
-      item: 'Media: New York Photoshoot',
-      user: 'Admin',
-      timestamp: new Date(Date.now() - 172800000),
-    },
+      id: '3',
+      type: 'portfolio',
+      action: 'create',
+      item: {
+        id: '103',
+        title: 'Media: New York Photoshoot'
+      },
+      user: {
+        id: '1',
+        name: 'Admin'
+      },
+      timestamp: new Date(Date.now() - 172800000)
+    }
   ]);
   
   // Format date for display
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString(undefined, { 
+  const formatDate = (date: Date | string) => {
+    const dateObject = typeof date === 'string' ? new Date(date) : date;
+    return dateObject.toLocaleDateString(undefined, { 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric', 
@@ -184,32 +182,70 @@ const DashboardPanel: React.FC = () => {
     setTimeout(() => setSuccessMessage(''), 3000);
   };
 
+  // Mock dashboard data
+  const fetchDashboardData = () => {
+    // Mock data for testing
+    const stats: DashboardStats = {
+      portfolioItems: 48,
+      mediaItems: 325,
+      blogPosts: 17,
+      pageViews: 12453
+    };
+
+    const recentActivity: RecentActivity[] = [
+      {
+        id: '1',
+        type: 'portfolio',
+        action: 'create',
+        item: {
+          id: '101',
+          title: "Summer Collection"
+        },
+        user: {
+          id: '1',
+          name: "Jessica Khan"
+        },
+        timestamp: new Date("2023-04-15T10:30:00")
+      },
+      {
+        id: '2',
+        type: 'blog',
+        action: 'update',
+        item: {
+          id: '102',
+          title: "Fashion Week Photos"
+        },
+        user: {
+          id: '1',
+          name: "Jessica Khan"
+        },
+        timestamp: new Date("2023-04-14T15:45:00")
+      },
+      {
+        id: '3',
+        type: 'blog',
+        action: 'create',
+        item: {
+          id: '103',
+          title: "Behind the Scenes"
+        },
+        user: {
+          id: '1',
+          name: "Jessica Khan"
+        },
+        timestamp: new Date("2023-04-13T09:15:00")
+      }
+    ];
+
+    return { stats, recentActivity };
+  };
+
   // Set up dashboard state and data
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      setIsLoading(true);
-      
-      try {
-        // Mock data - would be fetched from Firebase in production
-        const dashboardStats = {
-          portfolioItems: 32,
-          blogPosts: 18, 
-          mediaItems: 45,
-          pageViews: 278,
-          visitorCount: 278
-        };
-        
-        setStats(dashboardStats);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError(t('admin.dashboard.loadError', 'Failed to load dashboard data'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchDashboardData();
+    const { stats, recentActivity } = fetchDashboardData();
+    setStats(stats);
+    setRecentActivities(recentActivity);
+    setError(null);
   }, [t]);
 
   return (
@@ -618,12 +654,12 @@ const DashboardPanel: React.FC = () => {
                 transition={{ duration: 0.3, delay: 0.1 }}
               >
                 <div className="p-2 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex-shrink-0">
-                  <i className={`ri-${activity.action === 'added' ? 'add-circle' : 
-                                activity.action === 'updated' ? 'edit' : 
-                                activity.action === 'uploaded' ? 'upload-cloud' : 'notification'}-line`}></i>
+                  <i className={`ri-${activity.action === 'create' ? 'add-circle' : 
+                                activity.action === 'update' ? 'edit' : 
+                                activity.action === 'delete' ? 'delete-bin' : 'notification'}-line`}></i>
                 </div>
                 <div>
-                  <p className="text-sm font-medium">{activity.item}</p>
+                  <p className="text-sm font-medium">{activity.item.title}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(activity.timestamp)}</p>
                 </div>
               </motion.div>
