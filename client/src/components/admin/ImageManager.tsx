@@ -173,7 +173,7 @@ const ImageManager: React.FC = () => {
         
         if (result.success) {
           // Add the new media to the list
-          setMedia([...media, result.data]);
+          setMedia([...media, result.data as MediaItem]);
           
           // Reset form
           setUrlInput('');
@@ -209,7 +209,7 @@ const ImageManager: React.FC = () => {
         const result = await response.json();
         
         if (result.success) {
-          setMedia([...media, result.data]);
+          setMedia([...media, result.data as MediaItem]);
           
           // Reset form
           setVideoUrlInput('');
@@ -249,7 +249,7 @@ const ImageManager: React.FC = () => {
         const result = await response.json();
         
         if (result.success) {
-          setMedia([...media, result.data]);
+          setMedia([...media, result.data as MediaItem]);
           
           // Reset form
           setUrlInput('');
@@ -296,8 +296,7 @@ const ImageManager: React.FC = () => {
         }
       }, 200);
       
-      // Upload each file sequentially
-      const newItems = [];
+      const newItems: MediaItem[] = [];
       
       for (const file of bulkFiles) {
         const formData = new FormData();
@@ -312,7 +311,7 @@ const ImageManager: React.FC = () => {
         const result = await response.json();
         
         if (result.success) {
-          newItems.push(result.data);
+          newItems.push(result.data as MediaItem);
         } else {
           console.error(`Failed to upload ${file.name}: ${result.message}`);
         }

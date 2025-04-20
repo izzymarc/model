@@ -59,7 +59,7 @@ export const getBlogPosts = async (onlyPublished = true): Promise<{ success: boo
     const snapshot = await getDocs(blogQuery);
     const posts = snapshot.docs.map(doc => ({ 
       id: doc.id, 
-      ...doc.data() 
+      ...doc.data() as Record<string, any>
     } as BlogPost));
     
     return {
@@ -98,7 +98,7 @@ export const getBlogPostBySlug = async (slug: string): Promise<{ success: boolea
     const postDoc = snapshot.docs[0];
     return {
       success: true,
-      data: { id: postDoc.id, ...postDoc.data() } as BlogPost
+      data: { id: postDoc.id, ...postDoc.data() as Record<string, any> } as BlogPost
     };
   } catch (error: any) {
     console.error(`Error fetching blog post with slug ${slug}:`, error);
@@ -133,7 +133,7 @@ export const getBlogPostsByCategory = async (category: string, onlyPublished = t
     const snapshot = await getDocs(categoryQuery);
     const posts = snapshot.docs.map(doc => ({ 
       id: doc.id, 
-      ...doc.data() 
+      ...doc.data() as Record<string, any>
     } as BlogPost));
     
     return {
@@ -164,7 +164,7 @@ export const createBlogPost = async (blogPost: Omit<BlogPost, 'id' | 'createdAt'
     const newDoc = await getDoc(docRef);
     return {
       success: true,
-      data: { id: docRef.id, ...newDoc.data() } as BlogPost
+      data: { id: docRef.id, ...newDoc.data() as Record<string, any> } as BlogPost
     };
   } catch (error: any) {
     console.error('Error creating blog post:', error);
@@ -186,7 +186,7 @@ export const updateBlogPost = async (id: string, blogPost: Partial<Omit<BlogPost
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
-        const currentData = docSnap.data();
+        const currentData = docSnap.data() as Record<string, any>;
         
         // If publishing for the first time or republishing
         if (blogPost.published && (!currentData.published || !currentData.publishedAt)) {
@@ -210,7 +210,7 @@ export const updateBlogPost = async (id: string, blogPost: Partial<Omit<BlogPost
     const updatedDoc = await getDoc(docRef);
     return {
       success: true,
-      data: { id, ...updatedDoc.data() } as BlogPost
+      data: { id, ...updatedDoc.data() as Record<string, any> } as BlogPost
     };
   } catch (error: any) {
     console.error(`Error updating blog post with ID ${id}:`, error);
@@ -239,4 +239,4 @@ export const deleteBlogPost = async (id: string): Promise<{ success: boolean; er
       error: error.message || `Failed to delete blog post with ID ${id}`
     };
   }
-}; 
+};

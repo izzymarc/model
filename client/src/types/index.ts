@@ -123,3 +123,21 @@ export interface SiteSettings {
   value: any;
   updatedAt: string;
 }
+
+// Dashboard Types
+export interface RecentActivity {
+  id: number;
+  type: string;
+  item: string;
+  user: string;
+  timestamp: Date;
+  action: string;
+}
+
+export interface DashboardStats {
+  portfolioItems: number;
+  mediaItems: number;
+  blogPosts: number;
+  pageViews: number;
+  visitorCount?: number;
+}

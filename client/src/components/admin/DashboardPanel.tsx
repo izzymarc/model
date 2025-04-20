@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { RecentActivity, DashboardStats } from '@/types';
 
 // Placeholder for chart component - in a real application, you would use a library like recharts
 const UsageChart: React.FC = () => {
@@ -40,21 +41,6 @@ interface FeaturedImage {
   location: string;
 }
 
-interface DashboardStats {
-  portfolioItems: number;
-  mediaItems: number;
-  blogPosts: number;
-  pageViews: number;
-}
-
-interface RecentActivity {
-  id: number;
-  type: string;
-  item: string;
-  user: string;
-  timestamp: Date;
-}
-
 const DashboardPanel: React.FC = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'day' | 'week' | 'month'>('week');
@@ -67,7 +53,6 @@ const DashboardPanel: React.FC = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [editCaption, setEditCaption] = useState('');
   const [editLocation, setEditLocation] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   
   // Mock data - would be fetched from Firebase in production
   const [stats, setStats] = useState<DashboardStats>({
@@ -80,20 +65,26 @@ const DashboardPanel: React.FC = () => {
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([
     {
       id: 1,
+      type: 'portfolio',
       action: 'added',
       item: 'Portfolio Item: Paris Fashion Week',
+      user: 'Admin',
       timestamp: new Date(Date.now() - 3600000),
     },
     {
       id: 2,
+      type: 'blog',
       action: 'updated',
       item: 'Blog Post: Behind the Scenes',
+      user: 'Admin',
       timestamp: new Date(Date.now() - 86400000),
     },
     {
       id: 3,
+      type: 'media',
       action: 'uploaded',
       item: 'Media: New York Photoshoot',
+      user: 'Admin',
       timestamp: new Date(Date.now() - 172800000),
     },
   ]);
@@ -204,6 +195,7 @@ const DashboardPanel: React.FC = () => {
           portfolioItems: 32,
           blogPosts: 18, 
           mediaItems: 45,
+          pageViews: 278,
           visitorCount: 278
         };
         
