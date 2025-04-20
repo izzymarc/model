@@ -1,29 +1,77 @@
-import { supabase, BlogPost, handleSupabaseError } from '../utils/supabase';
+import { db } from '../lib/firebase';
+import { 
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+  orderBy,
+  query,
+  where,
+  Timestamp,
+  limit
+} from 'firebase/firestore';
+
+// Define BlogPost interface
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  coverImage?: string;
+  category: string;
+  tags?: string[];
+  published: boolean;
+  publishedAt: Timestamp | null;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  author?: {
+    name: string;
+    imageUrl?: string;
+  };
+}
+
+const COLLECTION_NAME = 'blog_posts';
 
 /**
  * Get all blog posts
  */
 export const getBlogPosts = async (onlyPublished = true): Promise<{ success: boolean; data?: BlogPost[]; error?: string }> => {
   try {
-    let query = supabase
-      .from('blog_posts')
-      .select('*')
-      .order('published_at', { ascending: false });
-    
+    let blogQuery;
     if (onlyPublished) {
-      query = query.eq('published', true);
+      blogQuery = query(
+        collection(db, COLLECTION_NAME),
+        where('published', '==', true),
+        orderBy('publishedAt', 'desc')
+      );
+    } else {
+      blogQuery = query(
+        collection(db, COLLECTION_NAME),
+        orderBy('publishedAt', 'desc')
+      );
     }
     
-    const { data, error } = await query;
-    
-    if (error) throw error;
+    const snapshot = await getDocs(blogQuery);
+    const posts = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data() 
+    } as BlogPost));
     
     return {
       success: true,
-      data: data as BlogPost[]
+      data: posts
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Error fetching blog posts:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to fetch blog posts'
+    };
   }
 };
 
@@ -32,20 +80,32 @@ export const getBlogPosts = async (onlyPublished = true): Promise<{ success: boo
  */
 export const getBlogPostBySlug = async (slug: string): Promise<{ success: boolean; data?: BlogPost; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .single();
+    const slugQuery = query(
+      collection(db, COLLECTION_NAME),
+      where('slug', '==', slug),
+      limit(1)
+    );
     
-    if (error) throw error;
+    const snapshot = await getDocs(slugQuery);
     
+    if (snapshot.empty) {
+      return {
+        success: false,
+        error: `Blog post with slug "${slug}" not found`
+      };
+    }
+    
+    const postDoc = snapshot.docs[0];
     return {
       success: true,
-      data: data as BlogPost
+      data: { id: postDoc.id, ...postDoc.data() } as BlogPost
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error(`Error fetching blog post with slug ${slug}:`, error);
+    return {
+      success: false,
+      error: error.message || `Failed to fetch blog post with slug ${slug}`
+    };
   }
 };
 
@@ -54,71 +114,110 @@ export const getBlogPostBySlug = async (slug: string): Promise<{ success: boolea
  */
 export const getBlogPostsByCategory = async (category: string, onlyPublished = true): Promise<{ success: boolean; data?: BlogPost[]; error?: string }> => {
   try {
-    let query = supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('category', category)
-      .order('published_at', { ascending: false });
-    
+    let categoryQuery;
     if (onlyPublished) {
-      query = query.eq('published', true);
+      categoryQuery = query(
+        collection(db, COLLECTION_NAME),
+        where('category', '==', category),
+        where('published', '==', true),
+        orderBy('publishedAt', 'desc')
+      );
+    } else {
+      categoryQuery = query(
+        collection(db, COLLECTION_NAME),
+        where('category', '==', category),
+        orderBy('publishedAt', 'desc')
+      );
     }
     
-    const { data, error } = await query;
-    
-    if (error) throw error;
+    const snapshot = await getDocs(categoryQuery);
+    const posts = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data() 
+    } as BlogPost));
     
     return {
       success: true,
-      data: data as BlogPost[]
+      data: posts
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error(`Error fetching blog posts by category ${category}:`, error);
+    return {
+      success: false,
+      error: error.message || `Failed to fetch blog posts for category ${category}`
+    };
   }
 };
 
 /**
  * Create blog post
  */
-export const createBlogPost = async (blogPost: Omit<BlogPost, 'id' | 'created_at'>): Promise<{ success: boolean; data?: BlogPost; error?: string }> => {
+export const createBlogPost = async (blogPost: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data?: BlogPost; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .insert([blogPost])
-      .select()
-      .single();
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+      ...blogPost,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      publishedAt: blogPost.published ? Timestamp.now() : null
+    });
     
-    if (error) throw error;
-    
+    const newDoc = await getDoc(docRef);
     return {
       success: true,
-      data: data as BlogPost
+      data: { id: docRef.id, ...newDoc.data() } as BlogPost
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Error creating blog post:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to create blog post'
+    };
   }
 };
 
 /**
  * Update blog post
  */
-export const updateBlogPost = async (id: string, blogPost: Partial<BlogPost>): Promise<{ success: boolean; data?: BlogPost; error?: string }> => {
+export const updateBlogPost = async (id: string, blogPost: Partial<Omit<BlogPost, 'id' | 'createdAt'>>): Promise<{ success: boolean; data?: BlogPost; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .update(blogPost)
-      .eq('id', id)
-      .select()
-      .single();
+    // Check if publishing status changed
+    if (blogPost.published !== undefined) {
+      const docRef = doc(db, COLLECTION_NAME, id);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const currentData = docSnap.data();
+        
+        // If publishing for the first time or republishing
+        if (blogPost.published && (!currentData.published || !currentData.publishedAt)) {
+          // Fix the timestamp issue
+          blogPost = {
+            ...blogPost,
+            publishedAt: Timestamp.now()
+          };
+        }
+      }
+    }
+
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const updateData = {
+      ...blogPost,
+      updatedAt: serverTimestamp()
+    };
     
-    if (error) throw error;
+    await updateDoc(docRef, updateData);
     
+    const updatedDoc = await getDoc(docRef);
     return {
       success: true,
-      data: data as BlogPost
+      data: { id, ...updatedDoc.data() } as BlogPost
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error(`Error updating blog post with ID ${id}:`, error);
+    return {
+      success: false,
+      error: error.message || `Failed to update blog post with ID ${id}`
+    };
   }
 };
 
@@ -127,17 +226,17 @@ export const updateBlogPost = async (id: string, blogPost: Partial<BlogPost>): P
  */
 export const deleteBlogPost = async (id: string): Promise<{ success: boolean; error?: string }> => {
   try {
-    const { error } = await supabase
-      .from('blog_posts')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
+    const docRef = doc(db, COLLECTION_NAME, id);
+    await deleteDoc(docRef);
     
     return {
       success: true
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error(`Error deleting blog post with ID ${id}:`, error);
+    return {
+      success: false,
+      error: error.message || `Failed to delete blog post with ID ${id}`
+    };
   }
 }; 

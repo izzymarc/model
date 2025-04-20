@@ -70,7 +70,7 @@ const Press = () => {
                 </p>
                 
                 <a 
-                  href={item.link} 
+                  href={item.url} 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="inline-flex items-center text-accent font-technical text-sm hover:underline"
