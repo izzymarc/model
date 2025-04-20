@@ -1,13 +1,15 @@
 [build]
-  command = "npm run build"
-  publish = "dist/public"
+  base = "/"
+  publish = "client/dist"
+  command = "node fix-typescript-errors.js && cd client && npm run build"
 
-# Handle SPA routing
+# Handle routing for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
+# Environment settings
 [build.environment]
   NODE_VERSION = "18"
 

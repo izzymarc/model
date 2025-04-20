@@ -42,6 +42,24 @@ export interface Experience {
   updatedAt: string;
 }
 
+export interface Media {
+  id: string;
+  name: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  url: string;
+  thumbnailUrl?: string;
+  width?: number;
+  height?: number;
+  alt?: string;
+  description?: string;
+  category?: string;
+  tags?: string[];
+  uploadedAt: string;
+  updatedAt: string;
+}
+
 export interface PressItem {
   id: string;
   title: string;
