@@ -228,7 +228,7 @@ const PortfolioManager: React.FC = () => {
                     <div className="h-12 w-16 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden">
                       <img 
                         src={item.image} 
-                        alt={item.titleKey} 
+                        alt={t(item.titleKey, item.titleKey)} 
                         className="h-full w-full object-cover"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = '/images/me/portrait-headshot.jpg';
@@ -238,10 +238,10 @@ const PortfolioManager: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {item.titleKey}
+                      {t(item.titleKey, item.titleKey)}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-                      {item.descriptionKey}
+                      {t(item.descriptionKey, item.descriptionKey)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
