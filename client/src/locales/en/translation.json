@@ -90,16 +90,52 @@
         "description": "Haute Couture Showcase"
       },
       "fashion1": {
-        "title": "Modern Runway",
-        "description": "Paris Fashion Week 2024"
+        "title": "Ethereal Silhouette",
+        "description": "Avant-Garde Editorial Series"
+      },
+      "fashion2": {
+        "title": "Urban Sophistication",
+        "description": "Metropolitan Fashion Narrative"
+      },
+      "fashion3": {
+        "title": "Sculptural Elegance",
+        "description": "Architectural Inspired Couture"
       },
       "fashion4": {
-        "title": "Luxury Couture",
-        "description": "Premium Fashion Editorial"
+        "title": "Monochrome Vision",
+        "description": "Contemporary Minimalism Collection"
       },
       "fashion5": {
-        "title": "Vogue Editorial",
-        "description": "High Fashion Campaign 2025"
+        "title": "Chromatic Momentum",
+        "description": "Dynamic Commercial Campaign"
+      },
+      "reddress": {
+        "title": "Crimson Couture",
+        "description": "Statement Runway Collection"
+      },
+      "whitedress": {
+        "title": "Ethereal Structure",
+        "description": "Avant-Garde Runway Piece"
+      },
+      "businessattire": {
+        "title": "Executive Redefined",
+        "description": "Modern Professional Aesthetic"
+      },
+      "blueoutfit": {
+        "title": "Azure Composition",
+        "description": "Contemporary Color Study"
+      },
+      "portrait": {
+        "title": "Luminous Portrait",
+        "description": "Authentic Beauty Study"
+      },
+      "model": {
+        "title": "Radiant Expression",
+        "description": "Signature Beauty Editorial"
+      },
+      "perfume": {
+        "title": "Essence Captured",
+        "description": "Luxury Fragrance Campaign"
       }
     }
   },
