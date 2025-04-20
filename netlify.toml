@@ -1,7 +1,7 @@
 [build]
-  base = "/"
+  base = "."
+  command = "npm run build"
   publish = "client/dist"
-  command = "cd client && npm run build"
 
 # Handle routing for SPA
 [[redirects]]
@@ -12,6 +12,16 @@
 # Environment settings
 [build.environment]
   NODE_VERSION = "18"
+  VITE_FIREBASE_API_KEY = "dummy-api-key"
+  VITE_FIREBASE_AUTH_DOMAIN = "dummy-project.firebaseapp.com"
+  VITE_FIREBASE_PROJECT_ID = "dummy-project"
+  VITE_FIREBASE_STORAGE_BUCKET = "dummy-project.appspot.com"
+  VITE_FIREBASE_MESSAGING_SENDER_ID = "123456789"
+  VITE_FIREBASE_APP_ID = "1:123456789:web:abcdef123456"
+  VITE_FIREBASE_MEASUREMENT_ID = "G-ABCDEFGHI"
+  VITE_API_URL = "/api"
+  VITE_STORAGE_URL = "/storage"
+  VITE_APP_NAME = "Professional Portfolio"
 
 [[headers]]
   for = "/*"
