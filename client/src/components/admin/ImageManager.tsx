@@ -1,554 +1,802 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-interface ImageItem {
+interface MediaItem {
   id: string;
-  src: string;
-  alt: string;
-  caption: string;
-  category: string;
+  name: string;
+  path: string;
+  url: string;
+  size: string;
+  dimensions: string;
+  type: string;
+  uploadDate: string;
+  isVideo?: boolean;
+  category?: string;
 }
 
 const ImageManager: React.FC = () => {
   const { t } = useTranslation();
-  const [images, setImages] = useState<ImageItem[]>([]);
-  const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
-  const [newImage, setNewImage] = useState<{
-    file: File | null;
-    alt: string;
-    caption: string;
-    category: string;
-  }>({
-    file: null,
-    alt: '',
-    caption: '',
-    category: 'fashion'
-  });
-  const [isUploading, setIsUploading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
-  const [filter, setFilter] = useState<string>('all');
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  const [activeTab, setActiveTab] = useState<'gallery' | 'upload' | 'url' | 'video' | 'bulk'>('gallery');
+  const [urlInput, setUrlInput] = useState('');
+  const [videoUrlInput, setVideoUrlInput] = useState('');
+  const [mediaName, setMediaName] = useState('');
+  const [mediaCategory, setMediaCategory] = useState('portfolio');
+  const [fileSize, setFileSize] = useState<number | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isVideo, setIsVideo] = useState(false);
+  const [bulkFiles, setBulkFiles] = useState<File[]>([]);
+  const [bulkCategory, setBulkCategory] = useState('portfolio');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const bulkInputRef = useRef<HTMLInputElement>(null);
 
-  // Categories for the portfolio
+  // Suggested dimensions for different image types
+  const suggestedDimensions = {
+    "portfolio": "1280x960 (4:3 ratio)",
+    "about": "853x1280 (2:3 ratio)",
+    "hero": "1920x1080 (16:9 ratio)",
+    "blog": "1200x800 (3:2 ratio)",
+    "instagram": "1080x1080 (1:1 ratio)",
+    "press": "1200x800 (3:2 ratio)",
+    "gallery": "1920x1080 (16:9 ratio)",
+    "videos": "1920x1080 (16:9 ratio)"
+  };
+
   const categories = [
-    { id: 'fashion', name: t('admin.images.categories.fashion', 'Fashion') },
-    { id: 'editorial', name: t('admin.images.categories.editorial', 'Editorial') },
-    { id: 'commercial', name: t('admin.images.categories.commercial', 'Commercial') },
-    { id: 'portrait', name: t('admin.images.categories.portrait', 'Portrait') }
+    { value: 'portfolio', label: 'Portfolio' },
+    { value: 'about', label: 'About' },
+    { value: 'blog', label: 'Blog' },
+    { value: 'instagram', label: 'Instagram' },
+    { value: 'press', label: 'Press' },
+    { value: 'hero', label: 'Hero' },
+    { value: 'gallery', label: 'Gallery' },
+    { value: 'videos', label: 'Videos' }
   ];
 
-  // Load images from local storage (in a real app, this would come from an API)
   useEffect(() => {
-    const savedImages = localStorage.getItem('portfolioImages');
-    if (savedImages) {
-      setImages(JSON.parse(savedImages));
-    } else {
-      // Demo images if none exist
-      const demoImages = [
-        {
-          id: '1',
-          src: '/images/portfolio/fashion1.jpg',
-          alt: 'Fashion shoot in elegant setting',
-          caption: 'Spring Collection Editorial',
-          category: 'fashion'
-        },
-        {
-          id: '2',
-          src: '/images/portfolio/fashion2.jpg',
-          alt: 'Professional fashion model',
-          caption: 'Designer Collaboration Series',
-          category: 'fashion'
-        },
-        {
-          id: '3',
-          src: '/images/portfolio/editorial1.jpg',
-          alt: 'Editorial fashion magazine shoot',
-          caption: 'Vogue Magazine Spread',
-          category: 'editorial'
-        },
-        {
-          id: '4',
-          src: '/images/portfolio/editorial2.jpg',
-          alt: 'High fashion editorial',
-          caption: 'Avant-garde Couture Series',
-          category: 'editorial'
-        },
-        {
-          id: '5',
-          src: '/images/portfolio/commercial1.jpg',
-          alt: 'Commercial advertising campaign',
-          caption: 'Luxury Brand Campaign',
-          category: 'commercial'
-        },
-        {
-          id: '6',
-          src: '/images/portfolio/commercial2.jpg',
-          alt: 'Fashion advertisement for luxury brand',
-          caption: 'Fragrance Collection Advertisement',
-          category: 'commercial'
-        },
-        {
-          id: '7',
-          src: '/images/portfolio/portrait1.jpg',
-          alt: 'Professional portrait of model',
-          caption: 'Beauty Campaign Portraits',
-          category: 'portrait'
-        },
-        {
-          id: '8',
-          src: '/images/portfolio/portrait2.jpg',
-          alt: 'Closeup portrait',
-          caption: 'Expressive Portrait Series',
-          category: 'portrait'
-        }
-      ];
-      setImages(demoImages);
-      localStorage.setItem('portfolioImages', JSON.stringify(demoImages));
-    }
+    // Fetch media when component mounts
+    fetchMedia();
   }, []);
 
-  // Save images to local storage whenever they change
-  useEffect(() => {
-    if (images.length > 0) {
-      localStorage.setItem('portfolioImages', JSON.stringify(images));
+  const fetchMedia = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/media');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch media: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setMedia(result.data || []);
+      } else {
+        throw new Error(result.message || 'Failed to fetch media');
+      }
+    } catch (error) {
+      console.error('Error fetching media:', error);
+      setError('Failed to load media files. Please try again later.');
+    } finally {
+      setLoading(false);
     }
-  }, [images]);
-
-  // Create preview when a file is selected
-  useEffect(() => {
-    if (newImage.file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(newImage.file);
-    } else {
-      setPreviewUrl(null);
-    }
-  }, [newImage.file]);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setNewImage({
-        ...newImage,
-        file: e.target.files[0]
-      });
-    }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setFileSize(file.size);
+    setMediaName(file.name);
+    setIsVideo(file.type.startsWith('video/'));
+    
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleUpload = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith('video/')) return;
     
-    if (!newImage.file) {
-      setMessage({ text: t('admin.images.noFileSelected', 'Please select an image file'), type: 'error' });
-      return;
-    }
+    setFileSize(file.size);
+    setMediaName(file.name);
+    setIsVideo(true);
     
-    setIsUploading(true);
+    // Create preview URL
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+  };
+
+  const handleBulkFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
     
-    // Simulate upload (in a real app, you would upload to a server)
-    setTimeout(() => {
-      try {
-        // Create an object URL for the file (temporary in-memory URL)
-        const imageUrl = URL.createObjectURL(newImage.file as Blob);
+    const fileArray = Array.from(files);
+    setBulkFiles(fileArray);
+  };
+
+  const handleUrlPreview = () => {
+    if (!urlInput) return;
+    setPreviewUrl(urlInput);
+    setIsVideo(false);
+    
+    // Extract filename from URL
+    const urlParts = urlInput.split('/');
+    const fileName = urlParts[urlParts.length - 1].split('?')[0];
+    setMediaName(fileName || 'image.jpg');
+  };
+
+  const handleVideoUrlPreview = () => {
+    if (!videoUrlInput) return;
+    setPreviewUrl(videoUrlInput);
+    setIsVideo(true);
+    
+    // Extract filename from URL
+    const urlParts = videoUrlInput.split('/');
+    const fileName = urlParts[urlParts.length - 1].split('?')[0];
+    setMediaName(fileName || 'video.mp4');
+  };
+
+  const handleUpload = async () => {
+    try {
+      if (!previewUrl || !mediaName) {
+        return; // No file selected
+      }
+    
+      // If it's a file upload from computer
+      if (fileInputRef.current?.files?.length) {
+        const file = fileInputRef.current.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("category", mediaCategory);
         
-        // Add new image to the list
-        const newImageItem: ImageItem = {
-          id: Date.now().toString(),
-          src: imageUrl, // In a real app, this would be the URL from the server
-          alt: newImage.alt,
-          caption: newImage.caption,
-          category: newImage.category
-        };
+        // Show loading state here if needed
         
-        setImages([...images, newImageItem]);
-        
-        // Reset the form
-        setNewImage({
-          file: null,
-          alt: '',
-          caption: '',
-          category: 'fashion'
+        const response = await fetch('/api/media/upload', {
+          method: 'POST',
+          body: formData,
         });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Add the new media to the list
+          setMedia([...media, result.data]);
+          
+          // Reset form
+          setUrlInput('');
+          setVideoUrlInput('');
+          setMediaName('');
+          setPreviewUrl(null);
+          setFileSize(null);
+          setIsVideo(false);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+          
+          // Switch back to gallery view
+          setActiveTab('gallery');
+        } else {
+          // Handle error
+          console.error("Upload failed:", result.message);
+          // Show error message to user
+        }
+      } 
+      // If it's a video file upload
+      else if (videoInputRef.current?.files?.length) {
+        const file = videoInputRef.current.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("category", "videos");
+        
+        const response = await fetch('/api/media/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          setMedia([...media, result.data]);
+          
+          // Reset form
+          setVideoUrlInput('');
+          setMediaName('');
+          setPreviewUrl(null);
+          setFileSize(null);
+          setIsVideo(false);
+          if (videoInputRef.current) {
+            videoInputRef.current.value = '';
+          }
+          
+          // Switch back to gallery view
+          setActiveTab('gallery');
+        } else {
+          console.error("Upload failed:", result.message);
+        }
+      }
+      // If it's a URL input
+      else if (urlInput) {
+        // For URL input, we'd typically download the file on the server first
+        // Here's a simplified approach just for demo purposes
+        const formData = new FormData();
+        
+        // Create a fetch request to get the image
+        const imgResponse = await fetch(urlInput);
+        const imgBlob = await imgResponse.blob();
+        const file = new File([imgBlob], mediaName, { type: imgBlob.type });
+        
+        formData.append("file", file);
+        formData.append("category", mediaCategory);
+        
+        const response = await fetch('/api/media/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          setMedia([...media, result.data]);
+          
+          // Reset form
+          setUrlInput('');
+          setMediaName('');
+          setPreviewUrl(null);
+          
+          // Switch back to gallery view
+          setActiveTab('gallery');
+        } else {
+          console.error("Upload failed:", result.message);
+        }
+      }
+      // If it's a video URL input
+      else if (videoUrlInput) {
+        // Video URLs would typically need to be processed differently
+        // This is just a simplified example
+        alert("Video URL upload is not implemented in this demo");
+        
+        // Reset form
+        setVideoUrlInput('');
+        setMediaName('');
         setPreviewUrl(null);
         
-        setMessage({ text: t('admin.images.uploadSuccess', 'Image uploaded successfully'), type: 'success' });
-      } catch (error) {
-        setMessage({ text: t('admin.images.uploadError', 'Error uploading image'), type: 'error' });
-      } finally {
-        setIsUploading(false);
+        // Switch back to gallery view
+        setActiveTab('gallery');
       }
-    }, 1500);
-  };
-
-  const handleDeleteImage = (id: string) => {
-    if (window.confirm(t('admin.images.confirmDelete', 'Are you sure you want to delete this image?'))) {
-      setImages(images.filter(img => img.id !== id));
-      setMessage({ text: t('admin.images.deleteSuccess', 'Image deleted successfully'), type: 'success' });
+    } catch (error) {
+      console.error("Error during upload:", error);
+      // Show error message to user
     }
   };
 
-  const handleUpdateImage = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!selectedImage) return;
-    
-    // Update the image
-    const updatedImages = images.map(img => 
-      img.id === selectedImage.id ? selectedImage : img
-    );
-    
-    setImages(updatedImages);
-    setMessage({ text: t('admin.images.updateSuccess', 'Image updated successfully'), type: 'success' });
-    setSelectedImage(null);
+  const handleBulkUpload = async () => {
+    try {
+      if (bulkFiles.length === 0) return;
+      
+      // Simulate progress
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += 5;
+        setUploadProgress(progress);
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+        }
+      }, 200);
+      
+      // Upload each file sequentially
+      const newItems = [];
+      
+      for (const file of bulkFiles) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("category", bulkCategory);
+        
+        const response = await fetch('/api/media/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          newItems.push(result.data);
+        } else {
+          console.error(`Failed to upload ${file.name}: ${result.message}`);
+        }
+      }
+      
+      // Clear progress interval if still running
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+      
+      // Add all successfully uploaded items to the media list
+      setMedia([...media, ...newItems]);
+      
+      // Reset form
+      setBulkFiles([]);
+      setUploadProgress(0);
+      if (bulkInputRef.current) {
+        bulkInputRef.current.value = '';
+      }
+      
+      // Switch back to gallery view
+      setTimeout(() => {
+        setActiveTab('gallery');
+        setUploadProgress(0);
+      }, 1000);
+    } catch (error) {
+      console.error("Error during bulk upload:", error);
+      setUploadProgress(0);
+      // Show error message to user
+    }
   };
 
-  // Filter images based on category
-  const filteredImages = filter === 'all' 
-    ? images 
-    : images.filter(image => image.category === filter);
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`/api/media/${id}`, {
+        method: 'DELETE',
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Remove deleted item from the media list
+        setMedia(media.filter(item => item.id !== id));
+      } else {
+        console.error("Delete failed:", result.message);
+        // Show error message to user
+      }
+    } catch (error) {
+      console.error("Error during delete:", error);
+      // Show error message to user
+    }
+  };
 
   return (
-    <div>
-      <h2 className="text-2xl font-heading mb-6">{t('admin.images.title', 'Image Manager')}</h2>
-      
-      {/* Message display */}
-      <AnimatePresence>
-        {message && (
-          <motion.div 
-            className={`p-4 mb-6 rounded-md ${message.type === 'success' ? 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-100' : 'bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-100'}`}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">
+          {t('admin.mediaManager.title', 'Media Manager')}
+        </h2>
+        <div className="flex space-x-2 overflow-x-auto pb-2">
+          <button
+            className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap ${
+              activeTab === 'gallery' 
+                ? 'bg-black text-white dark:bg-white dark:text-black' 
+                : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+            }`}
+            onClick={() => setActiveTab('gallery')}
           >
-            {message.text}
-            <button 
-              className="float-right" 
-              onClick={() => setMessage(null)}
+            {t('admin.mediaManager.gallery', 'Gallery')}
+          </button>
+          <button
+            className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap ${
+              activeTab === 'upload' 
+                ? 'bg-black text-white dark:bg-white dark:text-black' 
+                : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+            }`}
+            onClick={() => setActiveTab('upload')}
+          >
+            {t('admin.mediaManager.upload', 'Upload Image')}
+          </button>
+          <button
+            className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap ${
+              activeTab === 'url' 
+                ? 'bg-black text-white dark:bg-white dark:text-black' 
+                : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+            }`}
+            onClick={() => setActiveTab('url')}
+          >
+            {t('admin.mediaManager.fromUrl', 'From URL')}
+          </button>
+          <button
+            className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap ${
+              activeTab === 'video' 
+                ? 'bg-black text-white dark:bg-white dark:text-black' 
+                : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+            }`}
+            onClick={() => setActiveTab('video')}
+          >
+            {t('admin.mediaManager.video', 'Upload Video')}
+          </button>
+          <button
+            className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap ${
+              activeTab === 'bulk' 
+                ? 'bg-black text-white dark:bg-white dark:text-black' 
+                : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+            }`}
+            onClick={() => setActiveTab('bulk')}
+          >
+            {t('admin.mediaManager.bulk', 'Bulk Upload')}
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+
+      {activeTab === 'gallery' && loading ? (
+        <div className="text-center py-10">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">Loading media files...</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {media.map(item => (
+              <motion.div
+                key={item.id}
+                className="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-md"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="aspect-w-16 aspect-h-9 relative">
+                  {item.isVideo ? (
+                    <video 
+                      src={item.path} 
+                      controls
+                      className="object-cover w-full h-full"
+                      onError={(e) => {
+                        // Fallback to URL if path fails
+                        (e.target as HTMLVideoElement).src = item.url;
+                      }}
+                    />
+                  ) : (
+                    <img 
+                      src={item.path} 
+                      alt={item.name}
+                      className="object-cover w-full h-full"
+                      onError={(e) => {
+                        // Fallback to URL if path fails
+                        (e.target as HTMLImageElement).src = item.url;
+                      }}
+                    />
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="font-medium text-gray-900 dark:text-white truncate">{item.name}</h3>
+                  <div className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                    <p>Type: {item.isVideo ? 'Video' : 'Image'}</p>
+                    <p>Size: {item.size}</p>
+                    <p>Dimensions: {item.dimensions}</p>
+                    <p>Uploaded: {item.uploadDate}</p>
+                  </div>
+                  <div className="mt-4 flex justify-between">
+                    <button
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                      onClick={() => window.open(item.path, '_blank')}
+                    >
+                      View
+                    </button>
+                    <button
+                      className="text-red-600 dark:text-red-400 hover:underline"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'upload' && (
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 space-y-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('admin.mediaManager.selectCategory', 'Select Category')}
+            </label>
+            <select
+              value={mediaCategory}
+              onChange={(e) => setMediaCategory(e.target.value)}
+              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             >
-              ×
+              {categories.filter(cat => cat.value !== 'videos').map(category => (
+                <option key={category.value} value={category.value}>{category.label}</option>
+              ))}
+            </select>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Suggested dimensions: {suggestedDimensions[mediaCategory as keyof typeof suggestedDimensions]}
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('admin.mediaManager.uploadImage', 'Upload Image')}
+            </label>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            />
+          </div>
+          
+          {previewUrl && !isVideo && (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('admin.mediaManager.preview', 'Preview')}
+              </p>
+              <div className="max-w-md mx-auto bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <img 
+                  src={previewUrl} 
+                  alt="Preview" 
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+            </div>
+          )}
+          
+          <div className="pt-4">
+            <button
+              onClick={handleUpload}
+              disabled={!previewUrl || isVideo}
+              className={`w-full px-4 py-2 rounded-md text-white font-medium ${
+                previewUrl && !isVideo ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+              }`}
+            >
+              {t('admin.mediaManager.uploadButton', 'Upload Image')}
             </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Upload new image form */}
-      <motion.div 
-        className="bg-gray-50 dark:bg-gray-700 p-6 rounded-md mb-8 shadow-md"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-      >
-        <h3 className="text-lg font-medium mb-4">{t('admin.images.uploadNew', 'Upload New Image')}</h3>
-        
-        <form onSubmit={handleUpload} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-1">
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  {t('admin.images.selectFile', 'Select Image File')}
-                </label>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleFileChange} 
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded p-2 dark:bg-gray-800"
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'url' && (
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 space-y-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('admin.mediaManager.selectCategory', 'Select Category')}
+            </label>
+            <select
+              value={mediaCategory}
+              onChange={(e) => setMediaCategory(e.target.value)}
+              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            >
+              {categories.filter(cat => cat.value !== 'videos').map(category => (
+                <option key={category.value} value={category.value}>{category.label}</option>
+              ))}
+            </select>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Suggested dimensions: {suggestedDimensions[mediaCategory as keyof typeof suggestedDimensions]}
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('admin.mediaManager.imageUrl', 'Image URL')}
+            </label>
+            <input
+              type="text"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              placeholder="https://example.com/image.jpg"
+              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            />
+          </div>
+          
+          <div>
+            <button
+              onClick={handleUrlPreview}
+              disabled={!urlInput}
+              className={`w-full px-4 py-2 rounded-md text-white font-medium ${
+                urlInput ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+              }`}
+            >
+              {t('admin.mediaManager.previewUrl', 'Preview URL')}
+            </button>
+          </div>
+          
+          {previewUrl && !isVideo && (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('admin.mediaManager.preview', 'Preview')}
+              </p>
+              <div className="bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <img 
+                  src={previewUrl} 
+                  alt="Preview" 
+                  className="w-full h-auto object-contain"
+                  onError={() => {
+                    alert('Unable to load image from URL. Please check the URL and try again.');
+                    setPreviewUrl(null);
+                  }}
                 />
               </div>
               
-              {/* Preview */}
-              {previewUrl && (
-                <div className="relative aspect-[4/5] mb-4">
-                  <img 
-                    src={previewUrl} 
-                    alt="Preview" 
-                    className="w-full h-full object-cover rounded-md"
-                  />
-                </div>
-              )}
-            </div>
-            
-            <div className="md:col-span-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t('admin.images.altText', 'Alt Text')}
+              <div className="mt-4 space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t('admin.mediaManager.imageName', 'Image Name')}
                   </label>
-                  <input 
-                    type="text" 
-                    value={newImage.alt} 
-                    onChange={(e) => setNewImage({...newImage, alt: e.target.value})}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded p-2 dark:bg-gray-800"
-                    placeholder={t('admin.images.altTextPlaceholder', 'Describe the image for accessibility')}
+                  <input
+                    type="text"
+                    value={mediaName}
+                    onChange={(e) => setMediaName(e.target.value)}
+                    placeholder="my-image.jpg"
+                    className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t('admin.images.category', 'Category')}
-                  </label>
-                  <select 
-                    value={newImage.category} 
-                    onChange={(e) => setNewImage({...newImage, category: e.target.value})}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded p-2 dark:bg-gray-800"
-                  >
-                    {categories.map(category => (
-                      <option key={category.id} value={category.id}>{category.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  {t('admin.images.caption', 'Caption')}
-                </label>
-                <textarea 
-                  value={newImage.caption} 
-                  onChange={(e) => setNewImage({...newImage, caption: e.target.value})}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded p-2 dark:bg-gray-800"
-                  rows={2}
-                  placeholder={t('admin.images.captionPlaceholder', 'Enter a caption for this image')}
-                />
-              </div>
-              
-              <button 
-                type="submit" 
-                className="w-full bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded hover:bg-gray-800 dark:hover:bg-gray-200 disabled:opacity-50 transition-colors"
-                disabled={isUploading || !newImage.file}
-              >
-                {isUploading ? 
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white dark:text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    {t('admin.images.uploading', 'Uploading...')}
-                  </span> : 
-                  t('admin.images.upload', 'Upload Image')
-                }
-              </button>
-            </div>
-          </div>
-        </form>
-      </motion.div>
-      
-      {/* Category filters */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button
-          onClick={() => setFilter('all')}
-          className={`px-3 py-1 text-sm rounded-full transition-colors ${
-            filter === 'all' 
-              ? 'bg-black text-white dark:bg-white dark:text-black' 
-              : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-          }`}
-        >
-          {t('portfolio.filters.all', 'All')}
-        </button>
-        
-        {categories.map(category => (
-          <button
-            key={category.id}
-            onClick={() => setFilter(category.id)}
-            className={`px-3 py-1 text-sm rounded-full transition-colors ${
-              filter === category.id 
-                ? 'bg-black text-white dark:bg-white dark:text-black' 
-                : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-            }`}
-          >
-            {category.name}
-          </button>
-        ))}
-      </div>
-      
-      {/* Image gallery */}
-      <motion.h3 
-        className="text-lg font-medium mb-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        {t('admin.images.gallery', 'Image Gallery')} 
-        {filter !== 'all' && (
-          <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
-            {`(${t(`admin.images.categories.${filter}`, filter)} ${t('category', 'category')})`}
-          </span>
-        )}
-      </motion.h3>
-      
-      {filteredImages.length === 0 ? (
-        <motion.p 
-          className="text-gray-500 dark:text-gray-400 text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-md"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          {filter === 'all' 
-            ? t('admin.images.noImages', 'No images uploaded yet. Add some images above.')
-            : t('admin.images.noImagesInCategory', 'No images in this category. Add some or select a different category.')}
-        </motion.p>
-      ) : (
-        <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          {filteredImages.map((image, index) => (
-            <motion.div 
-              key={image.id} 
-              className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow group"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * index }}
-              whileHover={{ y: -5 }}
-            >
-              <div className="aspect-[4/5] relative overflow-hidden">
-                <img 
-                  src={image.src} 
-                  alt={image.alt}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-4">
-                  <div className="text-white">
-                    <p className="text-sm font-medium">{image.caption}</p>
-                    <p className="text-xs opacity-75">{categories.find(c => c.id === image.category)?.name}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setSelectedImage(image)}
-                      className="bg-white text-black rounded-full p-2 hover:bg-gray-200 transition-colors"
-                      title={t('admin.images.edit', 'Edit')}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteImage(image.id)}
-                      className="bg-white text-black rounded-full p-2 hover:bg-gray-200 transition-colors"
-                      title={t('admin.images.delete', 'Delete')}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4">
-                <p className="font-medium line-clamp-1">{image.caption}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {categories.find(c => c.id === image.category)?.name || image.category}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
-      
-      {/* Edit image modal */}
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div 
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-          >
-            <motion.div 
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-xl overflow-hidden"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">{t('admin.images.editImage', 'Edit Image')}</h3>
-                <button 
-                  onClick={() => setSelectedImage(null)} 
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                <button
+                  onClick={handleUpload}
+                  className="w-full px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
+                  {t('admin.mediaManager.saveImage', 'Save Image')}
                 </button>
               </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'video' && (
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 space-y-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('admin.mediaManager.uploadVideo', 'Upload Video')}
+            </label>
+            <input
+              type="file"
+              ref={videoInputRef}
+              onChange={handleVideoFileChange}
+              accept="video/*"
+              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('admin.mediaManager.videoUrl', 'Or Enter Video URL')}
+            </label>
+            <input
+              type="text"
+              value={videoUrlInput}
+              onChange={(e) => setVideoUrlInput(e.target.value)}
+              placeholder="https://example.com/video.mp4"
+              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            />
+            <button
+              onClick={handleVideoUrlPreview}
+              disabled={!videoUrlInput}
+              className={`w-full px-4 py-2 rounded-md text-white font-medium ${
+                videoUrlInput ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+              }`}
+            >
+              {t('admin.mediaManager.previewUrl', 'Preview URL')}
+            </button>
+          </div>
+          
+          {previewUrl && isVideo && (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('admin.mediaManager.preview', 'Preview')}
+              </p>
+              <div className="bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <video 
+                  src={previewUrl} 
+                  controls
+                  className="w-full h-auto"
+                  onError={() => {
+                    alert('Unable to load video. Please check the file or URL and try again.');
+                    setPreviewUrl(null);
+                  }}
+                />
+              </div>
               
-              <form onSubmit={handleUpdateImage} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="aspect-[4/5] relative rounded-md overflow-hidden">
-                    <img 
-                      src={selectedImage.src} 
-                      alt={selectedImage.alt}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        {t('admin.images.altText', 'Alt Text')}
-                      </label>
-                      <input 
-                        type="text" 
-                        value={selectedImage.alt} 
-                        onChange={(e) => setSelectedImage({...selectedImage, alt: e.target.value})}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded p-2 dark:bg-gray-700"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        {t('admin.images.category', 'Category')}
-                      </label>
-                      <select 
-                        value={selectedImage.category} 
-                        onChange={(e) => setSelectedImage({...selectedImage, category: e.target.value})}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded p-2 dark:bg-gray-700"
-                      >
-                        {categories.map(category => (
-                          <option key={category.id} value={category.id}>{category.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        {t('admin.images.caption', 'Caption')}
-                      </label>
-                      <textarea 
-                        value={selectedImage.caption} 
-                        onChange={(e) => setSelectedImage({...selectedImage, caption: e.target.value})}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded p-2 dark:bg-gray-700"
-                        rows={2}
-                      />
-                    </div>
-                  </div>
+              <div className="mt-4 space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t('admin.mediaManager.videoName', 'Video Name')}
+                  </label>
+                  <input
+                    type="text"
+                    value={mediaName}
+                    onChange={(e) => setMediaName(e.target.value)}
+                    placeholder="my-video.mp4"
+                    className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                  />
                 </div>
                 
-                <div className="flex justify-end space-x-2 mt-6">
-                  <button 
-                    type="button"
-                    onClick={() => setSelectedImage(null)}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded"
-                  >
-                    {t('admin.images.cancel', 'Cancel')}
-                  </button>
-                  <button 
-                    type="submit" 
-                    className="bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded transition-colors hover:bg-gray-800 dark:hover:bg-gray-200"
-                  >
-                    {t('admin.images.save', 'Save Changes')}
-                  </button>
+                <button
+                  onClick={handleUpload}
+                  className="w-full px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium"
+                >
+                  {t('admin.mediaManager.saveVideo', 'Save Video')}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'bulk' && (
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 space-y-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('admin.mediaManager.selectCategory', 'Select Category')}
+            </label>
+            <select
+              value={bulkCategory}
+              onChange={(e) => setBulkCategory(e.target.value)}
+              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            >
+              {categories.map(category => (
+                <option key={category.value} value={category.value}>{category.label}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('admin.mediaManager.bulkUpload', 'Select Multiple Files')}
+            </label>
+            <input
+              type="file"
+              ref={bulkInputRef}
+              onChange={handleBulkFileChange}
+              accept="image/*,video/*"
+              multiple
+              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            />
+          </div>
+          
+          {bulkFiles.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('admin.mediaManager.selectedFiles', 'Selected Files')}: {bulkFiles.length}
+              </p>
+              <ul className="max-h-40 overflow-y-auto bg-gray-200 dark:bg-gray-700 rounded-lg p-3">
+                {bulkFiles.map((file, index) => (
+                  <li key={index} className="text-gray-800 dark:text-gray-200 text-sm py-1">
+                    {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB) - {file.type}
+                  </li>
+                ))}
+              </ul>
+              
+              {uploadProgress > 0 && (
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 my-4">
+                  <div 
+                    className="bg-indigo-600 h-2.5 rounded-full" 
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
                 </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              )}
+              
+              <button
+                onClick={handleBulkUpload}
+                disabled={uploadProgress > 0}
+                className={`w-full mt-4 px-4 py-2 rounded-md text-white font-medium ${
+                  uploadProgress > 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+                }`}
+              >
+                {uploadProgress > 0 
+                  ? `${t('admin.mediaManager.uploading', 'Uploading')}... ${uploadProgress}%` 
+                  : t('admin.mediaManager.startUpload', 'Start Upload')}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

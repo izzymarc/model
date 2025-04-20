@@ -40,19 +40,49 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onRegister, onSwitchToLog
     setError('');
     
     try {
-      const { success, error } = await register(email, password, {
+      console.log('Attempting to register user with:', { email, name, passwordLength: password.length });
+      
+      const { success, error: registerError } = await register(email, password, {
         name: name,
         role: 'admin'
       });
       
+      console.log('Registration result:', { success, error: registerError });
+      
       if (success) {
+        console.log('Registration successful');
         onRegister();
+        setTimeout(() => {
+          window.location.href = '/admin';
+        }, 300);
       } else {
-        setError(error || t('admin.register.error', 'Registration failed'));
+        console.error('Registration failed:', registerError);
+        
+        // Provide more detailed error messages for Firebase errors
+        let errorMessage = registerError || t('admin.register.error', 'Registration failed');
+        
+        // Check for common Firebase registration errors
+        if (registerError?.includes('email-already-in-use')) {
+          errorMessage = t('admin.register.emailExists', 'This email is already registered. Please use a different email or try to login.');
+        } else if (registerError?.includes('weak-password')) {
+          errorMessage = t('admin.register.weakPassword', 'The password is too weak. Please use a stronger password.');
+        } else if (registerError?.includes('invalid-email')) {
+          errorMessage = t('admin.register.invalidEmail', 'The email address is invalid. Please check and try again.');
+        } else if (registerError?.includes('operation-not-allowed')) {
+          errorMessage = t('admin.register.notAllowed', 'Email/password accounts are not enabled. Please contact your administrator.');
+        } else if (registerError?.includes('network-request-failed')) {
+          errorMessage = t('admin.register.networkError', 'A network error occurred. Please check your connection and try again.');
+        }
+        
+        setError(errorMessage);
         setIsLoading(false);
       }
-    } catch (err) {
-      setError(t('admin.register.error', 'An error occurred during registration'));
+    } catch (err: any) {
+      console.error('Exception during registration:', err);
+      // Display detailed error message
+      setError(
+        `${t('admin.register.error', 'An error occurred during registration')}: ${err.message || 'Unknown error'}`
+      );
       setIsLoading(false);
     }
   };
@@ -188,6 +218,9 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onRegister, onSwitchToLog
         <p className="text-center text-gray-500 dark:text-gray-400 text-xs">
           {t('admin.register.securityNote', 'Password must be at least 6 characters long')}
         </p>
+        <div className="mt-4 text-center text-gray-500 dark:text-gray-400 text-xs">
+          <p><strong>Firebase Auth:</strong> Registration creates a new admin account in Firebase</p>
+        </div>
       </div>
     </motion.div>
   );

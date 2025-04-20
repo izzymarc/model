@@ -1,137 +1,211 @@
-import { supabase, handleSupabaseError } from '../utils/supabase';
+import { auth } from '../lib/firebase';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  updatePassword,
+  updateProfile,
+  onAuthStateChanged,
+  User,
+  UserCredential
+} from 'firebase/auth';
+
+/**
+ * Authentication service using Firebase
+ */
+
+interface AuthResponse {
+  success: boolean;
+  data?: {
+    user: User | null;
+    token?: string;
+  };
+  error?: string;
+}
 
 /**
  * Sign in with email and password
  */
-export const signInWithEmail = async (email: string, password: string): Promise<{ success: boolean; data?: any; error?: string }> => {
+export const signIn = async (
+  email: string,
+  password: string
+): Promise<AuthResponse> => {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (error) throw error;
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     
     return {
       success: true,
-      data
-    };
-  } catch (error) {
-    return handleSupabaseError(error);
-  }
-};
-
-/**
- * Create a new user with email and password
- */
-export const createUser = async (email: string, password: string, userData?: { [key: string]: any }): Promise<{ success: boolean; data?: any; error?: string }> => {
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: userData || {},
+      data: {
+        user: userCredential.user,
+        token: await userCredential.user.getIdToken()
       }
-    });
-    
-    if (error) throw error;
+    };
+  } catch (error: any) {
+    console.error('Sign in error:', error);
     
     return {
-      success: true,
-      data
+      success: false,
+      error: error.message || 'Failed to sign in'
     };
-  } catch (error) {
-    return handleSupabaseError(error);
   }
 };
 
 /**
- * Sign out current user
+ * Sign up with email and password
  */
-export const signOut = async (): Promise<{ success: boolean; error?: string }> => {
+export const signUp = async (
+  email: string,
+  password: string,
+  displayName?: string
+): Promise<AuthResponse> => {
   try {
-    const { error } = await supabase.auth.signOut();
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     
-    if (error) throw error;
+    // Update profile with display name if provided
+    if (displayName) {
+      await updateProfile(userCredential.user, { displayName });
+    }
     
     return {
-      success: true
+      success: true,
+      data: {
+        user: userCredential.user,
+        token: await userCredential.user.getIdToken()
+      }
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Sign up error:', error);
+    
+    return {
+      success: false,
+      error: error.message || 'Failed to sign up'
+    };
+  }
+};
+
+/**
+ * Sign out
+ */
+export const logout = async (): Promise<AuthResponse> => {
+  try {
+    await signOut(auth);
+    
+    return {
+      success: true,
+      data: {
+        user: null
+      }
+    };
+  } catch (error: any) {
+    console.error('Sign out error:', error);
+    
+    return {
+      success: false,
+      error: error.message || 'Failed to sign out'
+    };
   }
 };
 
 /**
  * Get current user
  */
-export const getCurrentUser = async (): Promise<{ success: boolean; data?: any; error?: string }> => {
+export const getCurrentUser = async (): Promise<AuthResponse> => {
   try {
-    const { data, error } = await supabase.auth.getUser();
-    
-    if (error) throw error;
+    const user = auth.currentUser;
     
     return {
       success: true,
-      data: data?.user
+      data: {
+        user,
+        token: user ? await user.getIdToken() : undefined
+      }
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Get current user error:', error);
+    
+    return {
+      success: false,
+      error: error.message || 'Failed to get current user'
+    };
   }
 };
 
 /**
- * Get current session
+ * Get session
  */
-export const getCurrentSession = async (): Promise<{ success: boolean; data?: any; error?: string }> => {
+export const getSession = async (): Promise<AuthResponse> => {
   try {
-    const { data, error } = await supabase.auth.getSession();
-    
-    if (error) throw error;
+    return getCurrentUser();
+  } catch (error: any) {
+    console.error('Get session error:', error);
     
     return {
-      success: true,
-      data: data?.session
+      success: false,
+      error: error.message || 'Failed to get session'
     };
-  } catch (error) {
-    return handleSupabaseError(error);
   }
 };
 
 /**
  * Reset password
  */
-export const resetPassword = async (email: string): Promise<{ success: boolean; error?: string }> => {
+export const resetPassword = async (email: string): Promise<AuthResponse> => {
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    
-    if (error) throw error;
+    await sendPasswordResetEmail(auth, email);
     
     return {
-      success: true
+      success: true,
+      data: {
+        user: null
+      }
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Reset password error:', error);
+    
+    return {
+      success: false,
+      error: error.message || 'Failed to send reset password email'
+    };
   }
 };
 
 /**
  * Update password
  */
-export const updatePassword = async (newPassword: string): Promise<{ success: boolean; error?: string }> => {
+export const updateUserPassword = async (password: string): Promise<AuthResponse> => {
   try {
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
+    const user = auth.currentUser;
     
-    if (error) throw error;
+    if (!user) {
+      return {
+        success: false,
+        error: 'No user is signed in'
+      };
+    }
+    
+    await updatePassword(user, password);
     
     return {
-      success: true
+      success: true,
+      data: {
+        user,
+        token: await user.getIdToken()
+      }
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Update password error:', error);
+    
+    return {
+      success: false,
+      error: error.message || 'Failed to update password'
+    };
   }
+};
+
+/**
+ * Auth state change listener
+ */
+export const onAuthChange = (callback: (user: User | null) => void) => {
+  return onAuthStateChanged(auth, callback);
 }; 

@@ -1,23 +1,59 @@
-import { supabase, Portfolio, handleSupabaseError } from '../utils/supabase';
+import { db } from '../lib/firebase';
+import { 
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+  orderBy,
+  query,
+  Timestamp
+} from 'firebase/firestore';
+
+// Define Portfolio interface
+export interface Portfolio {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  category: string;
+  tags?: string[];
+  isPublished: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+const COLLECTION_NAME = 'portfolio';
 
 /**
  * Get all portfolio items
  */
 export const getPortfolioItems = async (): Promise<{ success: boolean; data?: Portfolio[]; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('portfolio')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const portfolioQuery = query(
+      collection(db, COLLECTION_NAME),
+      orderBy('createdAt', 'desc')
+    );
     
-    if (error) throw error;
+    const snapshot = await getDocs(portfolioQuery);
+    const items = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data() 
+    } as Portfolio));
     
     return {
       success: true,
-      data: data as Portfolio[]
+      data: items
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Error fetching portfolio items:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to fetch portfolio items'
+    };
   }
 };
 
@@ -26,65 +62,76 @@ export const getPortfolioItems = async (): Promise<{ success: boolean; data?: Po
  */
 export const getPortfolioItemById = async (id: string): Promise<{ success: boolean; data?: Portfolio; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('portfolio')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const docSnap = await getDoc(docRef);
     
-    if (error) throw error;
+    if (!docSnap.exists()) {
+      return {
+        success: false,
+        error: 'Portfolio item not found'
+      };
+    }
     
     return {
       success: true,
-      data: data as Portfolio
+      data: { id: docSnap.id, ...docSnap.data() } as Portfolio
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error(`Error fetching portfolio item with ID ${id}:`, error);
+    return {
+      success: false,
+      error: error.message || `Failed to fetch portfolio item with ID ${id}`
+    };
   }
 };
 
 /**
  * Create portfolio item
  */
-export const createPortfolioItem = async (portfolioItem: Omit<Portfolio, 'id' | 'created_at'>): Promise<{ success: boolean; data?: Portfolio; error?: string }> => {
+export const createPortfolioItem = async (portfolioItem: Omit<Portfolio, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data?: Portfolio; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('portfolio')
-      .insert([portfolioItem])
-      .select()
-      .single();
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+      ...portfolioItem,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
     
-    if (error) throw error;
-    
+    const newDoc = await getDoc(docRef);
     return {
       success: true,
-      data: data as Portfolio
+      data: { id: docRef.id, ...newDoc.data() } as Portfolio
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Error creating portfolio item:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to create portfolio item'
+    };
   }
 };
 
 /**
  * Update portfolio item
  */
-export const updatePortfolioItem = async (id: string, portfolioItem: Partial<Portfolio>): Promise<{ success: boolean; data?: Portfolio; error?: string }> => {
+export const updatePortfolioItem = async (id: string, portfolioItem: Partial<Omit<Portfolio, 'id' | 'createdAt'>>): Promise<{ success: boolean; data?: Portfolio; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('portfolio')
-      .update(portfolioItem)
-      .eq('id', id)
-      .select()
-      .single();
+    const docRef = doc(db, COLLECTION_NAME, id);
+    await updateDoc(docRef, {
+      ...portfolioItem,
+      updatedAt: serverTimestamp()
+    });
     
-    if (error) throw error;
-    
+    const updatedDoc = await getDoc(docRef);
     return {
       success: true,
-      data: data as Portfolio
+      data: { id, ...updatedDoc.data() } as Portfolio
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error(`Error updating portfolio item with ID ${id}:`, error);
+    return {
+      success: false,
+      error: error.message || `Failed to update portfolio item with ID ${id}`
+    };
   }
 };
 
@@ -93,17 +140,17 @@ export const updatePortfolioItem = async (id: string, portfolioItem: Partial<Por
  */
 export const deletePortfolioItem = async (id: string): Promise<{ success: boolean; error?: string }> => {
   try {
-    const { error } = await supabase
-      .from('portfolio')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
+    const docRef = doc(db, COLLECTION_NAME, id);
+    await deleteDoc(docRef);
     
     return {
       success: true
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error(`Error deleting portfolio item with ID ${id}:`, error);
+    return {
+      success: false,
+      error: error.message || `Failed to delete portfolio item with ID ${id}`
+    };
   }
 }; 

@@ -1,3 +1,7 @@
+/**
+ * Common type definitions used throughout the application
+ */
+
 // Portfolio Types
 export type PortfolioCategory = "editorial" | "runway" | "commercial" | "beauty";
 
@@ -34,11 +38,16 @@ export interface TestimonialItem {
 
 // Press Types
 export interface PressItem {
-  titleKey: string;
+  id: string;
+  title: string;
+  publication: string;
+  description: string;
   date: string;
-  descriptionKey: string;
   image: string;
-  link: string;
+  url: string;
+  featured: boolean;
+  titleKey?: string;
+  descriptionKey?: string;
 }
 
 // Instagram Types
@@ -64,4 +73,53 @@ export interface ContactFormData {
 // Newsletter Form Types
 export interface NewsletterFormData {
   email: string;
+}
+
+export interface Media {
+  id: string;
+  name: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  url: string;
+  thumbnailUrl?: string;
+  width?: number;
+  height?: number;
+  alt?: string;
+  description?: string;
+  category?: string;
+  tags?: string[];
+  uploadedAt: string;
+  updatedAt: string;
+}
+
+export interface Experience {
+  id: string;
+  title: string;
+  company?: string;
+  location?: string;
+  description: string;
+  startDate: string;
+  endDate?: string;
+  isCurrentPosition: boolean;
+  order?: number;
+  featured: boolean;
+  isHighlighted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+  avatar_url?: string;
+}
+
+export interface SiteSettings {
+  id: number;
+  name: string;
+  value: any;
+  updatedAt: string;
 }

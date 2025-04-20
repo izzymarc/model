@@ -25,16 +25,18 @@ const createFileIfMissing = (filePath, content) => {
   }
 };
 
-// Ensure Media interface exists in supabase.ts
-const ensureMediaInterface = () => {
-  const supabasePath = path.join(__dirname, 'client', 'src', 'utils', 'supabase.ts');
+// Create types.ts for shared types
+const createTypesFile = () => {
+  const typesPath = path.join(__dirname, 'client', 'src', 'types', 'index.ts');
   
-  if (fs.existsSync(supabasePath)) {
-    let content = fs.readFileSync(supabasePath, 'utf8');
-    
-    if (!content.includes('export interface Media')) {
-      // Add Media interface after the Experience interface
-      const mediaInterface = `
+  if (!fs.existsSync(path.dirname(typesPath))) {
+    ensureDirectoryExists(path.dirname(typesPath));
+  }
+  
+  const typesContent = `/**
+ * Common type definitions used throughout the application
+ */
+
 export interface Media {
   id: string;
   name: string;
@@ -52,29 +54,52 @@ export interface Media {
   uploadedAt: string;
   updatedAt: string;
 }
+
+export interface Experience {
+  id: string;
+  title: string;
+  company?: string;
+  location?: string;
+  description: string;
+  startDate: string;
+  endDate?: string;
+  isCurrentPosition: boolean;
+  order?: number;
+  featured: boolean;
+  isHighlighted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PressItem {
+  id: string;
+  title: string;
+  publication: string;
+  description: string;
+  date: string;
+  image: string;
+  url: string;
+  featured: boolean;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+  avatar_url?: string;
+}
+
+export interface SiteSettings {
+  id: number;
+  name: string;
+  value: any;
+  updatedAt: string;
+}
 `;
-      
-      // Find where to insert the Media interface
-      const experienceInterfaceEnd = content.indexOf('export interface Experience') > -1 
-        ? content.indexOf('}', content.indexOf('export interface Experience')) + 1
-        : -1;
-      
-      if (experienceInterfaceEnd > -1) {
-        content = content.substring(0, experienceInterfaceEnd) + 
-                 mediaInterface + 
-                 content.substring(experienceInterfaceEnd);
-                 
-        fs.writeFileSync(supabasePath, content);
-        console.log(`Added Media interface to ${supabasePath}`);
-      } else {
-        console.log('Could not find appropriate place to add Media interface');
-      }
-    } else {
-      console.log('Media interface already exists in supabase.ts');
-    }
-  } else {
-    console.log(`Supabase utility file not found at ${supabasePath}`);
-  }
+  
+  createFileIfMissing(typesPath, typesContent);
+  console.log(`Created or updated types file at ${typesPath}`);
 };
 
 // Fix TypeScript errors by setting noImplicitAny to false
@@ -107,10 +132,10 @@ const main = () => {
     console.log('Starting TypeScript error fix script...');
     
     // Ensure directories exist
-    ensureDirectoryExists(path.join(__dirname, 'client', 'src', 'utils'));
+    ensureDirectoryExists(path.join(__dirname, 'client', 'src', 'types'));
     
-    // Add Media interface to supabase.ts
-    ensureMediaInterface();
+    // Create types file with required interfaces
+    createTypesFile();
     
     // Fix TypeScript config
     fixTsConfig();

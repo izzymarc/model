@@ -1,23 +1,65 @@
-import { supabase, Media, handleSupabaseError } from '../utils/supabase';
+import { db, storage } from '../lib/firebase';
+import { 
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  deleteDoc,
+  serverTimestamp,
+  orderBy,
+  query,
+  where,
+  Timestamp
+} from 'firebase/firestore';
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject
+} from 'firebase/storage';
+
+// Define Media interface
+export interface Media {
+  id: string;
+  title: string;
+  description?: string;
+  url: string;
+  type: 'image' | 'video' | 'document';
+  category: string;
+  tags?: string[];
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+const COLLECTION_NAME = 'media';
 
 /**
  * Get all media items
  */
 export const getMediaItems = async (): Promise<{ success: boolean; data?: Media[]; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('media')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const mediaQuery = query(
+      collection(db, COLLECTION_NAME),
+      orderBy('createdAt', 'desc')
+    );
     
-    if (error) throw error;
+    const snapshot = await getDocs(mediaQuery);
+    const items = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data() 
+    } as Media));
     
     return {
       success: true,
-      data: data as Media[]
+      data: items
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Error fetching media items:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to fetch media items'
+    };
   }
 };
 
@@ -26,25 +68,33 @@ export const getMediaItems = async (): Promise<{ success: boolean; data?: Media[
  */
 export const getMediaByCategory = async (category: string): Promise<{ success: boolean; data?: Media[]; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('media')
-      .select('*')
-      .eq('category', category)
-      .order('created_at', { ascending: false });
+    const categoryQuery = query(
+      collection(db, COLLECTION_NAME),
+      where('category', '==', category),
+      orderBy('createdAt', 'desc')
+    );
     
-    if (error) throw error;
+    const snapshot = await getDocs(categoryQuery);
+    const items = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data() 
+    } as Media));
     
     return {
       success: true,
-      data: data as Media[]
+      data: items
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error(`Error fetching media by category ${category}:`, error);
+    return {
+      success: false,
+      error: error.message || `Failed to fetch media for category ${category}`
+    };
   }
 };
 
 /**
- * Upload file to Supabase Storage
+ * Upload file to Firebase Storage
  */
 export const uploadFile = async (file: File, path: string): Promise<{ success: boolean; url?: string; error?: string }> => {
   try {
@@ -53,47 +103,50 @@ export const uploadFile = async (file: File, path: string): Promise<{ success: b
     const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     const filePath = `${path}/${fileName}`;
     
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
-      .from('media')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
+    // Create storage reference
+    const storageRef = ref(storage, filePath);
     
-    if (error) throw error;
+    // Upload to Firebase Storage
+    const snapshot = await uploadBytes(storageRef, file);
     
     // Get public URL
-    const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(data.path);
+    const downloadUrl = await getDownloadURL(snapshot.ref);
     
     return {
       success: true,
-      url: publicUrl
+      url: downloadUrl
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Error uploading file:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to upload file'
+    };
   }
 };
 
 /**
  * Create media record
  */
-export const createMediaItem = async (mediaItem: Omit<Media, 'id' | 'created_at'>): Promise<{ success: boolean; data?: Media; error?: string }> => {
+export const createMediaItem = async (mediaItem: Omit<Media, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data?: Media; error?: string }> => {
   try {
-    const { data, error } = await supabase
-      .from('media')
-      .insert([mediaItem])
-      .select()
-      .single();
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+      ...mediaItem,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
     
-    if (error) throw error;
-    
+    const newDoc = await getDoc(docRef);
     return {
       success: true,
-      data: data as Media
+      data: { id: docRef.id, ...newDoc.data() } as Media
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error('Error creating media item:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to create media item'
+    };
   }
 };
 
@@ -102,37 +155,24 @@ export const createMediaItem = async (mediaItem: Omit<Media, 'id' | 'created_at'
  */
 export const deleteMediaItem = async (id: string, url: string): Promise<{ success: boolean; error?: string }> => {
   try {
-    // First, get the media item to get the storage path
-    const { data: mediaItem, error: fetchError } = await supabase
-      .from('media')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (fetchError) throw fetchError;
-    
-    // Extract the path from the URL
-    const storagePath = url.split('/').slice(-2).join('/');
+    // Get Firebase storage reference from URL
+    const storageRef = ref(storage, url);
     
     // Delete from storage
-    const { error: storageError } = await supabase.storage
-      .from('media')
-      .remove([storagePath]);
-    
-    if (storageError) throw storageError;
+    await deleteObject(storageRef);
     
     // Delete from database
-    const { error: dbError } = await supabase
-      .from('media')
-      .delete()
-      .eq('id', id);
-    
-    if (dbError) throw dbError;
+    const docRef = doc(db, COLLECTION_NAME, id);
+    await deleteDoc(docRef);
     
     return {
       success: true
     };
-  } catch (error) {
-    return handleSupabaseError(error);
+  } catch (error: any) {
+    console.error(`Error deleting media item with ID ${id}:`, error);
+    return {
+      success: false,
+      error: error.message || `Failed to delete media item with ID ${id}`
+    };
   }
 }; 

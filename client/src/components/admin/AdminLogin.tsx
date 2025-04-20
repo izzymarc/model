@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { useAuth } from '../../contexts/AuthContext';
+import { authService } from '../../services/firebaseService';
+import { getAuth } from 'firebase/auth';
 
 interface AdminLoginProps {
   onLogin: () => void;
@@ -10,34 +11,45 @@ interface AdminLoginProps {
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) => {
   const { t } = useTranslation();
-  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Test Firebase connection on component mount
+  useEffect(() => {
+    const testFirebase = async () => {
+      console.log('Testing Firebase connection...');
+      
+      try {
+        // Just checking if auth is available is enough to test connection
+        const auth = getAuth();
+        console.log('Firebase connection test successful');
+      } catch (err: any) {
+        console.error('Exception during Firebase test:', err);
+        setError('Failed to connect to Firebase. Please check your configuration.');
+      }
+    };
+    
+    testFirebase();
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
-      setError(t('admin.login.emptyFields', 'Please enter both email and password'));
-      return;
-    }
-    
     setIsLoading(true);
     setError('');
-    
+
     try {
-      const { success, error } = await login(email, password);
-      
-      if (success) {
+      const result = await authService.signIn(email, password);
+      if (result.success) {
         onLogin();
       } else {
-        setError(error || t('admin.login.invalidCredentials', 'Invalid email or password'));
-        setIsLoading(false);
+        setError(result.error);
       }
-    } catch (err) {
-      setError(t('admin.login.error', 'An error occurred during login'));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -75,7 +87,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
             </motion.div>
           )}
           
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleLogin}>
             <div className="mb-4">
               <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="email">
                 {t('admin.login.email', 'Email')}
@@ -87,6 +99,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
                 onChange={(e) => setEmail(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder={t('admin.login.emailPlaceholder', 'Enter your email')}
+                required
               />
             </div>
             
@@ -101,7 +114,20 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
                 onChange={(e) => setPassword(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder={t('admin.login.passwordPlaceholder', '••••••••')}
+                required
               />
+            </div>
+            
+            <div className="mb-6">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="mr-2"
+                />
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('admin.login.rememberMe', 'Remember me')}</span>
+              </label>
             </div>
             
             <div className="flex flex-col space-y-4">
@@ -121,7 +147,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
                     {t('admin.login.loggingIn', 'Logging in...')}
                   </div>
                 ) : (
-                  t('admin.login.submit', 'Login')
+                  t('admin.login.login', 'Login')
                 )}
               </button>
               
@@ -150,8 +176,11 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onSwitchToRegister }) 
         </motion.div>
         
         <p className="text-center text-gray-500 dark:text-gray-400 text-xs">
-          {t('admin.login.demoNote', 'Use your Supabase credentials to log in')}
+          {t('admin.login.demoNote', 'Use your Firebase credentials to log in')}
         </p>
+        <div className="mt-4 text-center text-gray-500 dark:text-gray-400 text-xs">
+          <p><strong>Development Mode:</strong> Admin email: admin@example.com / Password: admin123</p>
+        </div>
       </div>
     </motion.div>
   );

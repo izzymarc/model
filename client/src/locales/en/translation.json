@@ -279,20 +279,15 @@
     "title": "Admin Dashboard",
     "logout": "Logout",
     "login": {
-      "title": "Admin Access",
-      "subtitle": "Enter your credentials to continue",
-      "email": "Email",
-      "emailPlaceholder": "Enter your email",
+      "title": "Admin Login",
+      "email": "Email Address",
       "password": "Password",
-      "passwordPlaceholder": "••••••••",
-      "emptyFields": "Please enter both email and password",
-      "invalidCredentials": "Invalid email or password",
-      "error": "An error occurred during login",
-      "submit": "Login",
-      "loggingIn": "Logging in...",
-      "forgotPassword": "Forgot password?",
-      "createAccount": "Create account",
-      "demoNote": "Use your Supabase credentials to log in"
+      "signIn": "Sign In",
+      "forgotPassword": "Forgot Password?",
+      "register": "Need an account?",
+      "error": "Invalid email or password",
+      "registerNow": "Register Now",
+      "demoNote": "Use your Firebase credentials to log in"
     },
     "register": {
       "title": "Create Admin Account",
