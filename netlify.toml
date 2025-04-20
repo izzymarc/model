@@ -1,7 +1,7 @@
 [build]
   base = "/"
   publish = "client/dist"
-  command = "node fix-typescript-errors.js && cd client && npm run build"
+  command = "cd client && npm run build"
 
 # Handle routing for SPA
 [[redirects]]
