@@ -15,8 +15,8 @@ const Footer = () => {
   
   const socialLinks = [
     { icon: "Instagram", url: "https://instagram.com/mirabel.udeagha", label: "Instagram" },
-    { icon: "Facebook", url: "https://facebook.com", label: "Facebook" },
-    { icon: "LinkedIn", url: "https://linkedin.com", label: "LinkedIn" },
+    { icon: "Facebook", url: "https://facebook.com/mirabel.udeagha", label: "Facebook" },
+    { icon: "LinkedIn", url: "https://linkedin.com/in/mirabel.udeagha", label: "LinkedIn" },
   ];
   
   const containerVariants = {

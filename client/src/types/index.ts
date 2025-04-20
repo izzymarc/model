@@ -126,12 +126,19 @@ export interface SiteSettings {
 
 // Dashboard Types
 export interface RecentActivity {
-  id: number;
-  type: string;
-  item: string;
-  user: string;
-  timestamp: Date;
-  action: string;
+  id: string;
+  type: 'portfolio' | 'blog' | 'experience' | 'testimonial' | 'media';
+  action: 'create' | 'update' | 'delete' | 'added';
+  item: {
+    id: string;
+    title: string;
+  };
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  timestamp: Date | string;
 }
 
 export interface DashboardStats {

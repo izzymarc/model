@@ -1,10 +1,11 @@
-import Hero from "@/components/home/Hero";
-import About from "@/components/home/About";
-import Portfolio from "@/components/home/Portfolio";
-import Modeling from "@/components/home/Modeling";
-import Instagram from "@/components/home/Instagram";
-import Contact from "@/components/home/Contact";
-import SectionDivider from "@/components/common/SectionDivider";
+import Hero from "../components/home/Hero";
+import About from "../components/home/About";
+import Portfolio from "../components/home/Portfolio";
+import Modeling from "../components/home/Modeling";
+import Instagram from "../components/home/Instagram";
+import Contact from "../components/home/Contact";
+import Blog from "../components/home/Blog";
+import SectionDivider from "../components/common/SectionDivider";
 import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
@@ -77,8 +78,10 @@ const Home = () => {
         <SectionDivider type="wave" color="background" />
         <About />
         <SectionDivider type="angle" color="background" />
-        <Instagram />
+        <Blog />
         <SectionDivider type="wave" color="background" />
+        <Instagram />
+        <SectionDivider type="angle" color="background" />
         <Contact />
       </motion.div>
     </AnimatePresence>

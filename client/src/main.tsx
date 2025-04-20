@@ -4,6 +4,10 @@ import App from './App';
 import './index.css';
 import '@/lib/i18n';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import { connectToEmulators } from './firebase/emulators';
+
+// Initialize Firebase emulators if in development mode
+connectToEmulators();
 
 // Theme initialization
 const initializeTheme = () => {

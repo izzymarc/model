@@ -4,7 +4,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -18,10 +18,11 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground min-h-screen;
+    font-family: 'Montserrat', sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    min-height: 100vh;
     line-height: 1.5;
-    background-color: #ffffff;
-    color: #000000;
   }
 
   img {

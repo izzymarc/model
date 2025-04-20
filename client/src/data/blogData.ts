@@ -84,7 +84,7 @@ export const blogPosts: BlogPost[] = [
     category: 'sustainability',
     publishDate: '2024-03-22',
     status: 'published',
-    featuredImage: '/images/blog/sustainability.jpg',
+    featuredImage: '/images/blog/sustainability-fashion.jpg',
     author: 'Mirabel N. Udeagha',
     slug: 'sustainable-fashion-small-changes'
   },

@@ -14,13 +14,7 @@ interface LazyImageProps {
   priority?: boolean;
 }
 
-// Ensure absolute paths for public directory
-const FALLBACK_IMAGES = {
-  fashion: '/images/fallback/fashion.jpg',
-  portrait: '/images/fallback/portrait.jpg',
-  instagram: '/images/fallback/instagram.jpg',
-  default: '/images/fallback/default.jpg'
-};
+const DEFAULT_FALLBACK = '/images/fallback/default.jpg';
 
 const LazyImage: React.FC<LazyImageProps> = ({
   src,
@@ -29,7 +23,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
   aspectRatio = 'aspect-[4/5]',
   objectFit = 'cover',
   objectPosition = 'center',
-  fallbackImage,
+  fallbackImage = DEFAULT_FALLBACK,
   onLoad,
   priority = false
 }) => {
@@ -39,29 +33,12 @@ const LazyImage: React.FC<LazyImageProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(normalizedSrc);
+  const [errorCount, setErrorCount] = useState(0);
   const imageRef = useRef<HTMLImageElement>(null);
   const { t } = useTranslation();
   
   // Track if component is mounted
   const isMounted = useRef(true);
-  
-  // Determine fallback image based on src or alt text
-  const determineFallback = () => {
-    if (fallbackImage) return fallbackImage;
-    
-    if (src.includes('fashion') || alt.toLowerCase().includes('fashion')) {
-      return FALLBACK_IMAGES.fashion;
-    }
-    if (src.includes('instagram')) {
-      return FALLBACK_IMAGES.instagram;
-    }
-    if (src.includes('portrait') || alt.toLowerCase().includes('portrait')) {
-      return FALLBACK_IMAGES.portrait;
-    }
-    return FALLBACK_IMAGES.default;
-  };
-  
-  const fallbackSrc = determineFallback();
   
   useEffect(() => {
     return () => {
@@ -76,6 +53,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
       setIsLoading(true);
       setHasError(false);
       setCurrentSrc(normalizedSrc);
+      setErrorCount(0);
     }
   }, [normalizedSrc, currentSrc, hasError]);
 
@@ -98,11 +76,11 @@ const LazyImage: React.FC<LazyImageProps> = ({
           console.error('Priority image failed to load:', normalizedSrc);
           setIsLoading(false);
           setHasError(true);
-          setCurrentSrc(fallbackSrc);
+          setCurrentSrc(fallbackImage);
         }
       };
     }
-  }, [priority, normalizedSrc, fallbackSrc, onLoad]);
+  }, [priority, normalizedSrc, fallbackImage, onLoad]);
 
   const handleLoad = () => {
     console.log('Image loaded successfully:', currentSrc);
@@ -112,10 +90,19 @@ const LazyImage: React.FC<LazyImageProps> = ({
   };
 
   const handleError = () => {
-    console.error('Image failed to load:', currentSrc, 'Falling back to:', fallbackSrc);
+    console.error('Image failed to load:', currentSrc);
+    
+    // If we haven't tried the fallback yet, try it
+    if (errorCount === 0) {
+      console.log('Attempting to load fallback image:', fallbackImage);
+      setErrorCount(1);
+      setCurrentSrc(fallbackImage);
+      return;
+    }
+    
+    // If fallback also failed, show error state
     setIsLoading(false);
     setHasError(true);
-    setCurrentSrc(fallbackSrc);
   };
 
   return (
@@ -165,8 +152,13 @@ const LazyImage: React.FC<LazyImageProps> = ({
       />
       
       {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700 bg-opacity-80 text-sm text-gray-500 p-2">
-          {t('common.imageError', 'Image could not be loaded')}
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-200 dark:bg-gray-700 bg-opacity-80 p-4">
+          <div className="text-sm text-gray-500 mb-2">
+            {t('common.imageError', 'Image could not be loaded')}
+          </div>
+          <div className="text-xs text-gray-400 text-center">
+            {t('common.imageErrorDetails', 'Original source: {{src}}', { src: normalizedSrc })}
+          </div>
         </div>
       )}
     </div>

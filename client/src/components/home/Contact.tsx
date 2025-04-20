@@ -78,7 +78,7 @@ const Contact = () => {
                 <i className="ri-map-pin-line text-xl mr-4"></i>
                 <div>
                   <p className="font-light text-sm uppercase tracking-wider mb-1">{t('contact.location', 'Location')}</p>
-                  <p className="dark:text-gray-200">Los Angeles, CA</p>
+                  <p className="dark:text-gray-200">Abuja, Nigeria</p>
                 </div>
               </div>
             </div>
@@ -86,13 +86,13 @@ const Contact = () => {
             <div>
               <h4 className="font-heading text-sm uppercase mb-4">{t('contact.followMe', 'Follow Me')}</h4>
               <div className="flex space-x-4">
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-black dark:hover:text-white" aria-label="Instagram">
+                <a href="https://instagram.com/mirabel.udeagha" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-black dark:hover:text-white" aria-label="Instagram">
                   <i className="ri-instagram-line text-2xl"></i>
                 </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-black dark:hover:text-white" aria-label="Twitter">
+                <a href="https://twitter.com/mirabel.udeagha" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-black dark:hover:text-white" aria-label="Twitter">
                   <i className="ri-twitter-line text-2xl"></i>
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-black dark:hover:text-white" aria-label="LinkedIn">
+                <a href="https://linkedin.com/in/mirabel.udeagha" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-black dark:hover:text-white" aria-label="LinkedIn">
                   <i className="ri-linkedin-line text-2xl"></i>
                 </a>
               </div>

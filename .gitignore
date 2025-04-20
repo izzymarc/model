@@ -49,3 +49,9 @@ temp
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Firebase
+.firebase/
+service-account.json
+.runtimeconfig.json
+firebase-debug.log

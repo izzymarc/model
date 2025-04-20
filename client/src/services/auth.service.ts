@@ -2,7 +2,7 @@ import { auth } from '../lib/firebase';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
-  signOut,
+  signOut as firebaseSignOut,
   sendPasswordResetEmail,
   updatePassword,
   updateProfile,
@@ -89,7 +89,7 @@ export const signUp = async (
  */
 export const logout = async (): Promise<AuthResponse> => {
   try {
-    await signOut(auth);
+    await firebaseSignOut(auth);
     
     return {
       success: true,
@@ -110,25 +110,8 @@ export const logout = async (): Promise<AuthResponse> => {
 /**
  * Get current user
  */
-export const getCurrentUser = async (): Promise<AuthResponse> => {
-  try {
-    const user = auth.currentUser;
-    
-    return {
-      success: true,
-      data: {
-        user,
-        token: user ? await user.getIdToken() : undefined
-      }
-    };
-  } catch (error: any) {
-    console.error('Get current user error:', error);
-    
-    return {
-      success: false,
-      error: error.message || 'Failed to get current user'
-    };
-  }
+export const getCurrentUser = (): User | null => {
+  return auth.currentUser;
 };
 
 /**
@@ -136,7 +119,16 @@ export const getCurrentUser = async (): Promise<AuthResponse> => {
  */
 export const getSession = async (): Promise<AuthResponse> => {
   try {
-    return getCurrentUser();
+    return getCurrentUser() ? {
+      success: true,
+      data: {
+        user: getCurrentUser(),
+        token: getCurrentUser() ? await getCurrentUser()!.getIdToken() : undefined
+      }
+    } : {
+      success: false,
+      error: 'No user is signed in'
+    };
   } catch (error: any) {
     console.error('Get session error:', error);
     
@@ -208,4 +200,16 @@ export const updateUserPassword = async (password: string): Promise<AuthResponse
  */
 export const onAuthChange = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback);
+};
+
+export const createUser = async (email: string, password: string): Promise<UserCredential> => {
+  return createUserWithEmailAndPassword(auth, email, password);
+};
+
+export const signInWithEmail = async (email: string, password: string): Promise<UserCredential> => {
+  return signInWithEmailAndPassword(auth, email, password);
+};
+
+export const signOut = async (): Promise<void> => {
+  return firebaseSignOut(auth);
 }; 

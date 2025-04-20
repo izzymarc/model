@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { useThemeToggle } from "@/hooks/use-theme";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useThemeToggle } from "../../hooks/use-theme";
+import { useLanguage } from "../../contexts/LanguageContext";
 import { useTranslation } from "react-i18next";
 import ThemeToggle from '../common/ThemeToggle';
 
@@ -69,11 +69,17 @@ const Navbar = () => {
     { name: t('nav.portfolio'), target: 'portfolio' },
     { name: t('nav.modeling'), target: 'modeling' },
     { name: t('nav.about'), target: 'about' },
+    { name: t('nav.blog'), target: '/blog', isPage: true },
     { name: t('nav.contact'), target: 'contact' },
   ];
 
   // Scroll to section if on home page and hash is provided
-  const scrollToSection = (sectionId: string) => {
+  const scrollToSection = (sectionId: string, isPage = false) => {
+    if (isPage) {
+      window.location.href = sectionId;
+      return;
+    }
+    
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ 
@@ -169,9 +175,9 @@ const Navbar = () => {
           {navLinks.map((link) => (
               <button
                 key={link.target}
-                onClick={() => scrollToSection(link.target)}
+                onClick={() => scrollToSection(link.target, link.isPage)}
                 className={`nav-link text-sm font-light uppercase tracking-wide cursor-pointer transition-all duration-300 ${
-                  activeSection === link.target ? 'text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'
+                  !link.isPage && activeSection === link.target ? 'text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'
                 }`}
               >
                 <span>{link.name}</span>
@@ -236,11 +242,11 @@ const Navbar = () => {
                     key={link.target}
                     variants={menuItemVariants}
                     onClick={() => {
-                      scrollToSection(link.target);
+                      scrollToSection(link.target, link.isPage);
                       closeMobileMenu();
                     }}
                     className={`text-left text-sm font-light uppercase tracking-wide py-2 transition-colors ${
-                      activeSection === link.target ? 'text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'
+                      !link.isPage && activeSection === link.target ? 'text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'
                     }`}
                     whileHover={{ x: 5 }}
                   >

@@ -10,6 +10,7 @@ import {
   Press,
   Contact,
   Admin,
+  Blog,
   NotFound
 } from "./pages";
 import Navbar from "./components/layout/Navbar";
@@ -19,6 +20,7 @@ import ScrollProgress from "./components/common/ScrollProgress";
 import LoadingFallback from "./components/common/LoadingFallback";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 // Initial loading animation
 const InitialLoader = () => {
@@ -66,6 +68,7 @@ function Router() {
         <Route path="/experience" component={Experience} />
         <Route path="/press" component={Press} />
         <Route path="/contact" component={Contact} />
+        <Route path="/blog" component={Blog} />
         <Route path="/admin" component={Admin} />
         <Route component={NotFound} />
       </Switch>
@@ -88,27 +91,29 @@ function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <div className="app-container min-h-screen flex flex-col bg-white dark:bg-gray-900 text-black dark:text-white">
-          <AnimatePresence mode="wait">
-            {loading && <InitialLoader />}
-          </AnimatePresence>
-          
-          <ScrollProgress />
-          <Navbar />
-          
-          <motion.main 
-            className="pt-16 flex-1"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: loading ? 1.5 : 0 }}
-          >
-            <Router />
-          </motion.main>
-          
-          <Footer />
-          <BackToTop />
-          <Toaster />
-        </div>
+        <AuthProvider>
+          <div className="app-container min-h-screen flex flex-col bg-white dark:bg-gray-900 text-black dark:text-white">
+            <AnimatePresence mode="wait">
+              {loading && <InitialLoader />}
+            </AnimatePresence>
+            
+            <ScrollProgress />
+            <Navbar />
+            
+            <motion.main 
+              className="pt-16 flex-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: loading ? 1.5 : 0 }}
+            >
+              <Router />
+            </motion.main>
+            
+            <Footer />
+            <BackToTop />
+            <Toaster />
+          </div>
+        </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   );

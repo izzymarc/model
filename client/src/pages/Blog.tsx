@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useRoute, Link } from 'wouter';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { blogPosts } from '../data/blogData';
@@ -10,7 +10,7 @@ import BlogPost from '../components/blog/BlogPost';
 
 const Blog: React.FC = () => {
   const { t } = useTranslation();
-  const { slug } = useParams<{ slug?: string }>();
+  const [match, params] = useRoute('/blog/:slug');
   const [categories, setCategories] = useState<string[]>([]);
   
   useEffect(() => {
@@ -22,8 +22,8 @@ const Blog: React.FC = () => {
   }, []);
 
   // If a slug is provided, show the individual blog post
-  if (slug) {
-    return <BlogPost slug={slug} />;
+  if (match && params?.slug) {
+    return <BlogPost slug={params.slug} />;
   }
 
   // Otherwise, show the blog list page

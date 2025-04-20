@@ -59,11 +59,11 @@ const Hero = () => {
           style={{ y, opacity }}
         >
           <LazyImage
-            src="/images/hero.jpeg"
-            alt={t('hero.backgroundAlt', 'Background image')}
+            src="/images/hero/red-dress-hero.jpg"
+            alt={t('hero.backgroundAlt', 'Fashion model in red dress')}
             className="w-full h-full"
             objectFit="cover"
-            objectPosition="center top"
+            objectPosition="center center"
             priority={true}
           />
         </motion.div>

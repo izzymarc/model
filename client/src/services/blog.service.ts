@@ -19,20 +19,14 @@ import {
 export interface BlogPost {
   id: string;
   title: string;
-  slug: string;
-  content: string;
   excerpt: string;
-  coverImage?: string;
+  content: string;
   category: string;
-  tags?: string[];
-  published: boolean;
-  publishedAt: Timestamp | null;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  author?: {
-    name: string;
-    imageUrl?: string;
-  };
+  publishDate: string;
+  status: 'draft' | 'published';
+  featuredImage: string;
+  author: string;
+  slug: string;
 }
 
 const COLLECTION_NAME = 'blog_posts';
@@ -40,203 +34,93 @@ const COLLECTION_NAME = 'blog_posts';
 /**
  * Get all blog posts
  */
-export const getBlogPosts = async (onlyPublished = true): Promise<{ success: boolean; data?: BlogPost[]; error?: string }> => {
+export const getBlogPosts = async (): Promise<BlogPost[]> => {
   try {
-    let blogQuery;
-    if (onlyPublished) {
-      blogQuery = query(
-        collection(db, COLLECTION_NAME),
-        where('published', '==', true),
-        orderBy('publishedAt', 'desc')
-      );
-    } else {
-      blogQuery = query(
-        collection(db, COLLECTION_NAME),
-        orderBy('publishedAt', 'desc')
-      );
+    const q = query(collection(db, COLLECTION_NAME), orderBy('publishDate', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as BlogPost));
+  } catch (error) {
+    console.error('Error getting blog posts:', error);
+    return [];
+  }
+};
+
+/**
+ * Get blog post by ID
+ */
+export const getBlogPostById = async (id: string): Promise<BlogPost | null> => {
+  try {
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as BlogPost;
     }
     
-    const snapshot = await getDocs(blogQuery);
-    const posts = snapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data() as Record<string, any>
-    } as BlogPost));
-    
-    return {
-      success: true,
-      data: posts
-    };
-  } catch (error: any) {
-    console.error('Error fetching blog posts:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to fetch blog posts'
-    };
+    return null;
+  } catch (error) {
+    console.error('Error getting blog post by ID:', error);
+    return null;
   }
 };
 
 /**
  * Get blog post by slug
  */
-export const getBlogPostBySlug = async (slug: string): Promise<{ success: boolean; data?: BlogPost; error?: string }> => {
+export const getBlogPostBySlug = async (slug: string): Promise<BlogPost | null> => {
   try {
-    const slugQuery = query(
-      collection(db, COLLECTION_NAME),
-      where('slug', '==', slug),
-      limit(1)
-    );
+    const q = query(collection(db, COLLECTION_NAME), where('slug', '==', slug));
+    const snapshot = await getDocs(q);
     
-    const snapshot = await getDocs(slugQuery);
-    
-    if (snapshot.empty) {
-      return {
-        success: false,
-        error: `Blog post with slug "${slug}" not found`
-      };
+    if (!snapshot.empty) {
+      const doc = snapshot.docs[0];
+      return { id: doc.id, ...doc.data() } as BlogPost;
     }
     
-    const postDoc = snapshot.docs[0];
-    return {
-      success: true,
-      data: { id: postDoc.id, ...postDoc.data() as Record<string, any> } as BlogPost
-    };
-  } catch (error: any) {
-    console.error(`Error fetching blog post with slug ${slug}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to fetch blog post with slug ${slug}`
-    };
-  }
-};
-
-/**
- * Get blog posts by category
- */
-export const getBlogPostsByCategory = async (category: string, onlyPublished = true): Promise<{ success: boolean; data?: BlogPost[]; error?: string }> => {
-  try {
-    let categoryQuery;
-    if (onlyPublished) {
-      categoryQuery = query(
-        collection(db, COLLECTION_NAME),
-        where('category', '==', category),
-        where('published', '==', true),
-        orderBy('publishedAt', 'desc')
-      );
-    } else {
-      categoryQuery = query(
-        collection(db, COLLECTION_NAME),
-        where('category', '==', category),
-        orderBy('publishedAt', 'desc')
-      );
-    }
-    
-    const snapshot = await getDocs(categoryQuery);
-    const posts = snapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data() as Record<string, any>
-    } as BlogPost));
-    
-    return {
-      success: true,
-      data: posts
-    };
-  } catch (error: any) {
-    console.error(`Error fetching blog posts by category ${category}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to fetch blog posts for category ${category}`
-    };
+    return null;
+  } catch (error) {
+    console.error('Error getting blog post by slug:', error);
+    return null;
   }
 };
 
 /**
  * Create blog post
  */
-export const createBlogPost = async (blogPost: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data?: BlogPost; error?: string }> => {
+export const createBlogPost = async (data: Omit<BlogPost, 'id'>): Promise<string | null> => {
   try {
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-      ...blogPost,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      publishedAt: blogPost.published ? Timestamp.now() : null
-    });
-    
-    const newDoc = await getDoc(docRef);
-    return {
-      success: true,
-      data: { id: docRef.id, ...newDoc.data() as Record<string, any> } as BlogPost
-    };
-  } catch (error: any) {
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), data);
+    return docRef.id;
+  } catch (error) {
     console.error('Error creating blog post:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to create blog post'
-    };
+    return null;
   }
 };
 
 /**
  * Update blog post
  */
-export const updateBlogPost = async (id: string, blogPost: Partial<Omit<BlogPost, 'id' | 'createdAt'>>): Promise<{ success: boolean; data?: BlogPost; error?: string }> => {
+export const updateBlogPost = async (id: string, data: Partial<BlogPost>): Promise<boolean> => {
   try {
-    // Check if publishing status changed
-    if (blogPost.published !== undefined) {
-      const docRef = doc(db, COLLECTION_NAME, id);
-      const docSnap = await getDoc(docRef);
-      
-      if (docSnap.exists()) {
-        const currentData = docSnap.data() as Record<string, any>;
-        
-        // If publishing for the first time or republishing
-        if (blogPost.published && (!currentData.published || !currentData.publishedAt)) {
-          // Fix the timestamp issue
-          blogPost = {
-            ...blogPost,
-            publishedAt: Timestamp.now()
-          };
-        }
-      }
-    }
-
     const docRef = doc(db, COLLECTION_NAME, id);
-    const updateData = {
-      ...blogPost,
-      updatedAt: serverTimestamp()
-    };
-    
-    await updateDoc(docRef, updateData);
-    
-    const updatedDoc = await getDoc(docRef);
-    return {
-      success: true,
-      data: { id, ...updatedDoc.data() as Record<string, any> } as BlogPost
-    };
-  } catch (error: any) {
-    console.error(`Error updating blog post with ID ${id}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to update blog post with ID ${id}`
-    };
+    await updateDoc(docRef, data);
+    return true;
+  } catch (error) {
+    console.error('Error updating blog post:', error);
+    return false;
   }
 };
 
 /**
  * Delete blog post
  */
-export const deleteBlogPost = async (id: string): Promise<{ success: boolean; error?: string }> => {
+export const deleteBlogPost = async (id: string): Promise<boolean> => {
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
     await deleteDoc(docRef);
-    
-    return {
-      success: true
-    };
-  } catch (error: any) {
-    console.error(`Error deleting blog post with ID ${id}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to delete blog post with ID ${id}`
-    };
+    return true;
+  } catch (error) {
+    console.error('Error deleting blog post:', error);
+    return false;
   }
 };

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import { portfolioData } from "@/data/portfolioData";
-import LazyImage from "@/components/common/LazyImage";
+import portfolioData from "../../data/portfolioData";
+import LazyImage from "../common/LazyImage";
 
 type Category = "all" | "editorial" | "runway" | "commercial" | "beauty";
 
@@ -178,13 +178,23 @@ const Portfolio = () => {
                 transition={{ duration: 0.3 }}
               >
                 <div className={`relative overflow-hidden ${isGridView ? '' : 'md:w-1/3'}`}>
-                  <LazyImage 
-                    src={item.image} 
-                    alt={t(item.titleKey, item.titleKey)} 
-                    aspectRatio={isGridView ? "aspect-[4/5]" : "aspect-[3/2]"}
-                    className="transition-transform duration-700 group-hover:scale-105"
-                    objectFit="cover"
-                  />
+                  {item.id === "p1" ? (
+                    <div className={`w-full h-full ${isGridView ? 'aspect-[4/5]' : 'aspect-[3/2]'} relative overflow-hidden`}>
+                      <img 
+                        src="/images/portfolio/luxury-perfume.jpg"
+                        alt={t(item.titleKey, item.titleKey)}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    </div>
+                  ) : (
+                    <LazyImage 
+                      src={item.image} 
+                      alt={t(item.titleKey, item.titleKey)} 
+                      aspectRatio={isGridView ? "aspect-[4/5]" : "aspect-[3/2]"}
+                      className="transition-transform duration-700 group-hover:scale-105"
+                      objectFit="cover"
+                    />
+                  )}
                   
                   {isGridView && (
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">

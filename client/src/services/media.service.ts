@@ -10,56 +10,38 @@ import {
   orderBy,
   query,
   where,
-  Timestamp
+  Timestamp,
+  updateDoc,
+  FieldValue
 } from 'firebase/firestore';
 import {
   ref,
   uploadBytes,
   getDownloadURL,
-  deleteObject
+  deleteObject,
+  listAll
 } from 'firebase/storage';
+import { Media as MediaType } from '../types';
 
-// Define Media interface
-export interface Media {
-  id: string;
-  title: string;
-  description?: string;
-  url: string;
-  type: 'image' | 'video' | 'document';
-  category: string;
-  tags?: string[];
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+// Define Media interface that extends MediaType with Firebase-specific fields
+export interface Media extends Omit<MediaType, 'uploadedAt' | 'updatedAt'> {
+  createdAt: Timestamp | FieldValue;
+  updatedAt: Timestamp | FieldValue;
 }
 
 const COLLECTION_NAME = 'media';
+const STORAGE_PATH = 'media';
 
 /**
  * Get all media items
  */
-export const getMediaItems = async (): Promise<{ success: boolean; data?: Media[]; error?: string }> => {
+export const getMediaItems = async (): Promise<Media[]> => {
   try {
-    const mediaQuery = query(
-      collection(db, COLLECTION_NAME),
-      orderBy('createdAt', 'desc')
-    );
-    
-    const snapshot = await getDocs(mediaQuery);
-    const items = snapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data() 
-    } as Media));
-    
-    return {
-      success: true,
-      data: items
-    };
-  } catch (error: any) {
-    console.error('Error fetching media items:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to fetch media items'
-    };
+    const snapshot = await getDocs(collection(db, COLLECTION_NAME));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Media));
+  } catch (error) {
+    console.error('Error getting media items:', error);
+    return [];
   }
 };
 
@@ -96,83 +78,107 @@ export const getMediaByCategory = async (category: string): Promise<{ success: b
 /**
  * Upload file to Firebase Storage
  */
-export const uploadFile = async (file: File, path: string): Promise<{ success: boolean; url?: string; error?: string }> => {
+export const uploadMedia = async (file: File, metadata?: Partial<MediaType>): Promise<Media | null> => {
   try {
-    // Generate a unique filename
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-    const filePath = `${path}/${fileName}`;
+    // Upload file to storage
+    const storageRef = ref(storage, `${STORAGE_PATH}/${file.name}`);
+    await uploadBytes(storageRef, file);
     
-    // Create storage reference
-    const storageRef = ref(storage, filePath);
+    // Get the download URL
+    const url = await getDownloadURL(storageRef);
     
-    // Upload to Firebase Storage
-    const snapshot = await uploadBytes(storageRef, file);
-    
-    // Get public URL
-    const downloadUrl = await getDownloadURL(snapshot.ref);
-    
-    return {
-      success: true,
-      url: downloadUrl
+    // Create media item in Firestore
+    const now = serverTimestamp();
+    const mediaData: Omit<Media, 'id'> = {
+      name: metadata?.name || file.name,
+      fileName: file.name,
+      fileType: file.type,
+      fileSize: file.size,
+      url: url,
+      thumbnailUrl: url, // Use same URL for thumbnail by default
+      alt: metadata?.alt || file.name,
+      description: metadata?.description || '',
+      category: metadata?.category || 'uncategorized',
+      tags: metadata?.tags || [],
+      createdAt: now,
+      updatedAt: now
     };
-  } catch (error: any) {
-    console.error('Error uploading file:', error);
+    
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), mediaData);
+    
+    // Return the full media item with ID
     return {
-      success: false,
-      error: error.message || 'Failed to upload file'
+      id: docRef.id,
+      ...mediaData
     };
+  } catch (error) {
+    console.error('Error uploading media:', error);
+    return null;
   }
 };
 
 /**
- * Create media record
+ * Get media by ID
  */
-export const createMediaItem = async (mediaItem: Omit<Media, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data?: Media; error?: string }> => {
+export const getMediaById = async (id: string): Promise<Media | null> => {
   try {
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-      ...mediaItem,
-      createdAt: serverTimestamp(),
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const snapshot = await getDoc(docRef);
+    
+    if (snapshot.exists()) {
+      return { id, ...snapshot.data() } as Media;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error getting media by ID:', error);
+    return null;
+  }
+};
+
+/**
+ * Update media item
+ */
+export const updateMedia = async (id: string, data: Partial<Media>): Promise<boolean> => {
+  try {
+    const docRef = doc(db, COLLECTION_NAME, id);
+    await updateDoc(docRef, {
+      ...data,
       updatedAt: serverTimestamp()
     });
-    
-    const newDoc = await getDoc(docRef);
-    return {
-      success: true,
-      data: { id: docRef.id, ...newDoc.data() } as Media
-    };
-  } catch (error: any) {
-    console.error('Error creating media item:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to create media item'
-    };
+    return true;
+  } catch (error) {
+    console.error('Error updating media:', error);
+    return false;
   }
 };
 
 /**
- * Delete media item from database and storage
+ * Delete media item
  */
-export const deleteMediaItem = async (id: string, url: string): Promise<{ success: boolean; error?: string }> => {
+export const deleteMedia = async (id: string): Promise<boolean> => {
   try {
-    // Get Firebase storage reference from URL
-    const storageRef = ref(storage, url);
-    
-    // Delete from storage
-    await deleteObject(storageRef);
-    
-    // Delete from database
+    // Get the media item first to get the file name
     const docRef = doc(db, COLLECTION_NAME, id);
-    await deleteDoc(docRef);
+    const snapshot = await getDoc(docRef);
     
-    return {
-      success: true
-    };
-  } catch (error: any) {
-    console.error(`Error deleting media item with ID ${id}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to delete media item with ID ${id}`
-    };
+    if (snapshot.exists()) {
+      const mediaData = snapshot.data() as Media;
+      
+      // Delete from storage if URL exists
+      if (mediaData.fileName) {
+        const storageRef = ref(storage, `${STORAGE_PATH}/${mediaData.fileName}`);
+        await deleteObject(storageRef);
+      }
+      
+      // Delete from Firestore
+      await deleteDoc(docRef);
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error deleting media:', error);
+    return false;
   }
 }; 

@@ -15,43 +15,19 @@ import {
 } from 'firebase/firestore';
 import { PressItem } from '../types';
 
-const COLLECTION_NAME = 'press_items';
+const COLLECTION_NAME = 'press';
 
 /**
  * Get all press items
  */
-export const getPressItems = async (): Promise<{ success: boolean; data?: PressItem[]; error?: string }> => {
+export const getPressItems = async (): Promise<PressItem[]> => {
   try {
-    const pressQuery = query(
-      collection(db, COLLECTION_NAME),
-      orderBy('date', 'desc')
-    );
-    
-    const snapshot = await getDocs(pressQuery);
-    const pressItems = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        title: data.title,
-        publication: data.publication,
-        description: data.description,
-        date: data.date,
-        image: data.image,
-        url: data.url,
-        featured: data.featured
-      } as PressItem;
-    });
-    
-    return {
-      success: true,
-      data: pressItems
-    };
-  } catch (error: any) {
-    console.error('Error fetching press items:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to fetch press items'
-    };
+    const q = query(collection(db, COLLECTION_NAME), orderBy('date', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PressItem));
+  } catch (error) {
+    console.error('Error getting press items:', error);
+    return [];
   }
 };
 
@@ -95,101 +71,61 @@ export const getFeaturedPressItems = async (): Promise<{ success: boolean; data?
 };
 
 /**
- * Create a press item
+ * Get a press item by ID
  */
-export const createPressItem = async (pressItem: Omit<PressItem, 'id'>): Promise<{ success: boolean; data?: PressItem; error?: string }> => {
+export const getPressItemById = async (id: string): Promise<PressItem | null> => {
   try {
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-      ...pressItem,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const docSnap = await getDoc(docRef);
     
-    const newItemSnapshot = await getDoc(docRef);
-    const data = newItemSnapshot.data();
-    
-    if (!data) {
-      throw new Error('Failed to retrieve created press item');
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as PressItem;
     }
     
-    return {
-      success: true,
-      data: {
-        id: docRef.id,
-        title: data.title,
-        publication: data.publication,
-        description: data.description,
-        date: data.date,
-        image: data.image,
-        url: data.url,
-        featured: data.featured
-      } as PressItem
-    };
-  } catch (error: any) {
+    return null;
+  } catch (error) {
+    console.error('Error getting press item by ID:', error);
+    return null;
+  }
+};
+
+/**
+ * Create a press item
+ */
+export const createPressItem = async (data: Omit<PressItem, 'id'>): Promise<string | null> => {
+  try {
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), data);
+    return docRef.id;
+  } catch (error) {
     console.error('Error creating press item:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to create press item'
-    };
+    return null;
   }
 };
 
 /**
  * Update a press item
  */
-export const updatePressItem = async (id: string, updates: Partial<PressItem>): Promise<{ success: boolean; data?: PressItem; error?: string }> => {
+export const updatePressItem = async (id: string, data: Partial<PressItem>): Promise<boolean> => {
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
-    await updateDoc(docRef, {
-      ...updates,
-      updatedAt: serverTimestamp()
-    });
-    
-    const updatedItemSnapshot = await getDoc(docRef);
-    const data = updatedItemSnapshot.data();
-    
-    if (!data) {
-      throw new Error('Failed to retrieve updated press item');
-    }
-    
-    return {
-      success: true,
-      data: {
-        id,
-        title: data.title,
-        publication: data.publication,
-        description: data.description,
-        date: data.date,
-        image: data.image,
-        url: data.url,
-        featured: data.featured
-      } as PressItem
-    };
-  } catch (error: any) {
-    console.error(`Error updating press item with ID ${id}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to update press item with ID ${id}`
-    };
+    await updateDoc(docRef, data);
+    return true;
+  } catch (error) {
+    console.error('Error updating press item:', error);
+    return false;
   }
 };
 
 /**
  * Delete a press item
  */
-export const deletePressItem = async (id: string): Promise<{ success: boolean; error?: string }> => {
+export const deletePressItem = async (id: string): Promise<boolean> => {
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
     await deleteDoc(docRef);
-    
-    return {
-      success: true
-    };
-  } catch (error: any) {
-    console.error(`Error deleting press item with ID ${id}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to delete press item with ID ${id}`
-    };
+    return true;
+  } catch (error) {
+    console.error('Error deleting press item:', error);
+    return false;
   }
 }; 

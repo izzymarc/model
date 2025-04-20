@@ -132,15 +132,25 @@ const ExperienceManager: React.FC = () => {
     try {
       if (isEditingExperience) {
         const firebaseData = toFirebaseModel(formData);
-        const updated = await updateExperience(isEditingExperience, firebaseData);
-        setExperiences(experiences.map(exp => 
-          exp.id === isEditingExperience ? updated : exp
-        ));
+        const success = await updateExperience(isEditingExperience, firebaseData);
+        
+        if (success) {
+          // Refresh the experiences list instead of trying to manually update it
+          const updatedExperiences = await getExperiences();
+          setExperiences(updatedExperiences);
+        }
+        
         setIsEditingExperience(null);
       } else if (isAddingExperience) {
         const firebaseData = toFirebaseModel(formData);
-        const created = await createExperience(firebaseData);
-        setExperiences([...experiences, created]);
+        const newId = await createExperience(firebaseData);
+        
+        if (newId) {
+          // Refresh the experiences list instead of trying to manually update it
+          const updatedExperiences = await getExperiences();
+          setExperiences(updatedExperiences);
+        }
+        
         setIsAddingExperience(false);
       }
       

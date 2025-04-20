@@ -178,4 +178,107 @@ export const storageService = {
     const storageRef = ref(storage, path);
     await deleteObject(storageRef);
   }
+};
+
+/**
+ * Generic function to get documents from a collection
+ */
+export const getCollection = async <T>(collectionName: string): Promise<T[]> => {
+  try {
+    const snapshot = await getDocs(collection(db, collectionName));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+  } catch (error) {
+    console.error(`Error getting collection ${collectionName}:`, error);
+    return [];
+  }
+};
+
+/**
+ * Generic function to get a document by ID
+ */
+export const getDocument = async <T>(collectionName: string, id: string): Promise<T | null> => {
+  try {
+    const docRef = doc(db, collectionName, id);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return { id, ...docSnap.data() } as T;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error(`Error getting document ${id} from ${collectionName}:`, error);
+    return null;
+  }
+};
+
+/**
+ * Generic function to create or update a document
+ */
+export const setDocument = async <T>(collectionName: string, id: string, data: Partial<T>): Promise<boolean> => {
+  try {
+    const docRef = doc(db, collectionName, id);
+    await setDoc(docRef, data, { merge: true });
+    return true;
+  } catch (error) {
+    console.error(`Error setting document ${id} in ${collectionName}:`, error);
+    return false;
+  }
+};
+
+/**
+ * Generic function to update a document
+ */
+export const updateDocument = async <T>(collectionName: string, id: string, data: Partial<T>): Promise<boolean> => {
+  try {
+    const docRef = doc(db, collectionName, id);
+    await updateDoc(docRef, data as any);
+    return true;
+  } catch (error) {
+    console.error(`Error updating document ${id} in ${collectionName}:`, error);
+    return false;
+  }
+};
+
+/**
+ * Generic function to delete a document
+ */
+export const deleteDocument = async (collectionName: string, id: string): Promise<boolean> => {
+  try {
+    const docRef = doc(db, collectionName, id);
+    await deleteDoc(docRef);
+    return true;
+  } catch (error) {
+    console.error(`Error deleting document ${id} from ${collectionName}:`, error);
+    return false;
+  }
+};
+
+/**
+ * Function to upload a file to Firebase Storage
+ */
+export const uploadFile = async (file: File, path: string): Promise<string | null> => {
+  try {
+    const storageRef = ref(storage, `${path}/${file.name}`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    return url;
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    return null;
+  }
+};
+
+/**
+ * Function to delete a file from Firebase Storage
+ */
+export const deleteFile = async (path: string): Promise<boolean> => {
+  try {
+    const storageRef = ref(storage, path);
+    await deleteObject(storageRef);
+    return true;
+  } catch (error) {
+    console.error(`Error deleting file at ${path}:`, error);
+    return false;
+  }
 }; 

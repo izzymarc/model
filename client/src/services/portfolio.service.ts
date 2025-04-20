@@ -12,6 +12,7 @@ import {
   query,
   Timestamp
 } from 'firebase/firestore';
+import { PortfolioItem } from '../types/portfolio';
 
 // Define Portfolio interface
 export interface Portfolio {
@@ -31,126 +32,73 @@ const COLLECTION_NAME = 'portfolio';
 /**
  * Get all portfolio items
  */
-export const getPortfolioItems = async (): Promise<{ success: boolean; data?: Portfolio[]; error?: string }> => {
+export const getPortfolioItems = async (): Promise<PortfolioItem[]> => {
   try {
-    const portfolioQuery = query(
-      collection(db, COLLECTION_NAME),
-      orderBy('createdAt', 'desc')
-    );
-    
-    const snapshot = await getDocs(portfolioQuery);
-    const items = snapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data() 
-    } as Portfolio));
-    
-    return {
-      success: true,
-      data: items
-    };
-  } catch (error: any) {
-    console.error('Error fetching portfolio items:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to fetch portfolio items'
-    };
+    const q = query(collection(db, COLLECTION_NAME), orderBy('year', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PortfolioItem));
+  } catch (error) {
+    console.error('Error getting portfolio items:', error);
+    return [];
   }
 };
 
 /**
  * Get portfolio item by ID
  */
-export const getPortfolioItemById = async (id: string): Promise<{ success: boolean; data?: Portfolio; error?: string }> => {
+export const getPortfolioItemById = async (id: string): Promise<PortfolioItem | null> => {
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
     const docSnap = await getDoc(docRef);
     
-    if (!docSnap.exists()) {
-      return {
-        success: false,
-        error: 'Portfolio item not found'
-      };
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as PortfolioItem;
     }
     
-    return {
-      success: true,
-      data: { id: docSnap.id, ...docSnap.data() } as Portfolio
-    };
-  } catch (error: any) {
-    console.error(`Error fetching portfolio item with ID ${id}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to fetch portfolio item with ID ${id}`
-    };
+    return null;
+  } catch (error) {
+    console.error('Error getting portfolio item by ID:', error);
+    return null;
   }
 };
 
 /**
  * Create portfolio item
  */
-export const createPortfolioItem = async (portfolioItem: Omit<Portfolio, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data?: Portfolio; error?: string }> => {
+export const createPortfolioItem = async (data: Omit<PortfolioItem, 'id'>): Promise<string | null> => {
   try {
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-      ...portfolioItem,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-    
-    const newDoc = await getDoc(docRef);
-    return {
-      success: true,
-      data: { id: docRef.id, ...newDoc.data() } as Portfolio
-    };
-  } catch (error: any) {
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), data);
+    return docRef.id;
+  } catch (error) {
     console.error('Error creating portfolio item:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to create portfolio item'
-    };
+    return null;
   }
 };
 
 /**
  * Update portfolio item
  */
-export const updatePortfolioItem = async (id: string, portfolioItem: Partial<Omit<Portfolio, 'id' | 'createdAt'>>): Promise<{ success: boolean; data?: Portfolio; error?: string }> => {
+export const updatePortfolioItem = async (id: string, data: Partial<PortfolioItem>): Promise<boolean> => {
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
-    await updateDoc(docRef, {
-      ...portfolioItem,
-      updatedAt: serverTimestamp()
-    });
-    
-    const updatedDoc = await getDoc(docRef);
-    return {
-      success: true,
-      data: { id, ...updatedDoc.data() } as Portfolio
-    };
-  } catch (error: any) {
-    console.error(`Error updating portfolio item with ID ${id}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to update portfolio item with ID ${id}`
-    };
+    await updateDoc(docRef, data);
+    return true;
+  } catch (error) {
+    console.error('Error updating portfolio item:', error);
+    return false;
   }
 };
 
 /**
  * Delete portfolio item
  */
-export const deletePortfolioItem = async (id: string): Promise<{ success: boolean; error?: string }> => {
+export const deletePortfolioItem = async (id: string): Promise<boolean> => {
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
     await deleteDoc(docRef);
-    
-    return {
-      success: true
-    };
-  } catch (error: any) {
-    console.error(`Error deleting portfolio item with ID ${id}:`, error);
-    return {
-      success: false,
-      error: error.message || `Failed to delete portfolio item with ID ${id}`
-    };
+    return true;
+  } catch (error) {
+    console.error('Error deleting portfolio item:', error);
+    return false;
   }
 }; 
