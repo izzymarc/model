@@ -10,7 +10,8 @@
     "experience": "Experience",
     "press": "Press",
     "contact": "Contact",
-    "modeling": "Modeling"
+    "modeling": "Modeling",
+    "blog": "Blog"
   },
   "hero": {
     "name": "Mirabel N. Udeagha",
@@ -25,7 +26,7 @@
     "connect": "Connect With Me",
     "emailMe": "Email Me",
     "quote": "My passion is to bring creative visions to life through fashion and editorial work.",
-    "paragraph1": "With over 7 years in the modeling industry, I've built a reputation for versatility and professionalism. My journey began in Lagos, Nigeria, before expanding to international markets including Paris, Milan, and New York.",
+    "paragraph1": "With over 7 years in the modeling industry, I've built a reputation for versatility and professionalism. My journey began in Lagos, Nigeria, before expanding to international markets including Paris, Milan, and Abuja.",
     "paragraph2": "I specialize in high-fashion editorial work, runway shows, and commercial campaigns, with a particular strength in luxury and avant-garde fashion. My background in dance gives me a unique understanding of movement and form that translates into dynamic, expressive poses.",
     "paragraph3": "I believe that great modeling is about collaboration and bringing creative visions to life through authentic expression and technical precision.",
     "height": {
@@ -118,11 +119,11 @@
     },
     "nyfw": {
       "title": "New York Fashion Week",
-      "description": "Opened for Michael Kors and closed for Marc Jacobs during NYFW, receiving significant media coverage for both appearances."
+      "description": "Opened for Michael Kors and closed for Marc Jacobs during NYFW, receiving significant media coverage for both appearances in Abuja and internationally."
     },
     "img": {
       "title": "Signed with IMG Models",
-      "description": "Joined the prestigious IMG Models agency, representing their New York, Paris, and Milan divisions."
+      "description": "Joined the prestigious IMG Models agency, representing their Abuja, Paris, and Milan divisions."
     }
   },
   "services": {
@@ -193,15 +194,9 @@
     "getInTouch": "Get in Touch",
     "intro": "For bookings, collaborations, or inquiries, please fill out the form or contact my agency directly.",
     "followMe": "Follow Me",
-    "email": {
-      "title": "Email"
-    },
-    "phone": {
-      "title": "Phone"
-    },
-    "agency": {
-      "title": "Agency"
-    },
+    "email": "Email",
+    "phone": "Phone",
+    "agency": "Agency",
     "form": {
       "name": "Name",
       "email": "Email",
@@ -267,6 +262,13 @@
     "subtitle": "Insights, behind-the-scenes, and industry perspectives",
     "readMore": "Read More",
     "viewAll": "View All Articles",
+    "by": "By",
+    "relatedPosts": "Related Posts",
+    "backToAllArticles": "Back to all articles",
+    "postNotFound": "Post Not Found",
+    "postNotFoundDesc": "The blog post you are looking for does not exist or has been removed.",
+    "backToBlog": "Back to Blog",
+    "noPosts": "No posts found in this category.",
     "categories": {
       "behindTheScenes": "Behind the Scenes",
       "sustainability": "Sustainability",
@@ -278,15 +280,120 @@
     "logout": "Logout",
     "login": {
       "title": "Admin Access",
-      "subtitle": "Enter your password to continue",
+      "subtitle": "Enter your credentials to continue",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
       "password": "Password",
-      "passwordRequired": "Password is required",
-      "invalidPassword": "Invalid password",
-      "loginButton": "Login"
+      "passwordPlaceholder": "••••••••",
+      "emptyFields": "Please enter both email and password",
+      "invalidCredentials": "Invalid email or password",
+      "error": "An error occurred during login",
+      "submit": "Login",
+      "loggingIn": "Logging in...",
+      "forgotPassword": "Forgot password?",
+      "createAccount": "Create account",
+      "demoNote": "Use your Supabase credentials to log in"
+    },
+    "register": {
+      "title": "Create Admin Account",
+      "subtitle": "Register to access the admin panel",
+      "name": "Full Name",
+      "namePlaceholder": "Enter your full name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "••••••••",
+      "emptyFields": "Please fill in all required fields",
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "error": "An error occurred during registration",
+      "submit": "Register",
+      "registering": "Registering...",
+      "alreadyHaveAccount": "Already have an account?",
+      "login": "Login",
+      "securityNote": "Password must be at least 6 characters long"
     },
     "nav": {
+      "dashboard": "Dashboard",
+      "portfolio": "Portfolio",
       "images": "Images",
-      "settings": "Settings"
+      "blog": "Blog",
+      "profile": "Profile",
+      "settings": "Settings",
+      "experience": "Experience",
+      "press": "Press"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "overview": "Portfolio performance overview",
+      "lastUpdated": "Last updated",
+      "visitors": "Visitors",
+      "portfolioViews": "Portfolio Views",
+      "contacts": "Contact Requests",
+      "blogReads": "Blog Reads",
+      "quickActions": "Quick Actions",
+      "recentActivity": "Recent Activity",
+      "imageUploaded": "Image uploaded",
+      "portfolioUpdated": "Portfolio updated",
+      "contactReceived": "New contact form submission",
+      "blogPosted": "Blog post published",
+      "newPost": "New Post",
+      "uploadImage": "Upload Image",
+      "portfolioItem": "Add Portfolio",
+      "siteSettings": "Site Settings",
+      "visitorActivity": "Visitor Activity",
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "avgTime": "Avg. Time on Site",
+      "upcomingTasks": "Upcoming Tasks",
+      "viewAll": "View all",
+      "due": "Due",
+      "addTask": "Add Task",
+      "performanceMetrics": "Performance Metrics",
+      "pageLoadTime": "Page Load Time",
+      "uptime": "Uptime",
+      "avgImageSize": "Avg. Image Size",
+      "errors": "JS Errors",
+      "good": "Good",
+      "warning": "Warning",
+      "attention": "Needs Attention",
+      "viewDetailedReport": "View detailed report",
+      "featuredImages": "Featured Images",
+      "addImage": "Add Image",
+      "displayedIn": "Displayed in"
+    },
+    "profile": {
+      "title": "Profile Management",
+      "basicInfo": "Basic Info",
+      "socialLinks": "Social Links",
+      "measurements": "Measurements",
+      "profileImage": "Profile Image",
+      "selectImage": "Select Image",
+      "name": "Full Name",
+      "title": "Professional Title",
+      "quote": "Personal Quote",
+      "bio": "Biography",
+      "bioPlaceholder": "A brief description of your professional background and experiences...",
+      "email": "Email",
+      "phone": "Phone",
+      "agency": "Agency",
+      "instagram": "Instagram",
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "height": "Height",
+      "bust": "Bust",
+      "waist": "Waist",
+      "hips": "Hips",
+      "shoes": "Shoes",
+      "hair": "Hair",
+      "eyes": "Eyes",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "saveSuccess": "Profile information saved successfully!"
     },
     "images": {
       "title": "Image Manager",
@@ -365,6 +472,51 @@
         "sustainability": "Sustainability",
         "careerAdvice": "Career Advice"
       }
+    },
+    "experience": {
+      "title": "Experience Management",
+      "addNew": "Add New Experience",
+      "editExperience": "Edit Experience",
+      "addExperience": "Add New Experience",
+      "experienceTitle": "Experience Title",
+      "company": "Company/Brand",
+      "date": "Date",
+      "featured": "Featured Experience",
+      "description": "Description",
+      "add": "Add Experience",
+      "update": "Update Experience",
+      "experiences": "Experiences",
+      "noExperiences": "No experiences added yet. Add your first experience above.",
+      "featuredBadge": "Featured",
+      "confirmDelete": "Are you sure you want to delete this experience?",
+      "deleteSuccess": "Experience deleted successfully",
+      "updateSuccess": "Experience updated successfully",
+      "addSuccess": "Experience added successfully",
+      "featureToggled": "Featured status updated"
+    },
+    "press": {
+      "title": "Press Management",
+      "addNew": "Add New Press Item",
+      "editPress": "Edit Press Item",
+      "addPress": "Add New Press Item",
+      "pressItems": "Press Items",
+      "noItems": "No press items added yet. Add your first press item above.",
+      "itemTitle": "Title",
+      "publication": "Publication",
+      "date": "Publication Date",
+      "url": "Article URL",
+      "image": "Image URL",
+      "featured": "Featured Press",
+      "description": "Description",
+      "add": "Add Press Item",
+      "update": "Update Press Item",
+      "featuredBadge": "Featured",
+      "viewArticle": "View Article",
+      "confirmDelete": "Are you sure you want to delete this press item?",
+      "deleteSuccess": "Press item deleted successfully",
+      "updateSuccess": "Press item updated successfully",
+      "addSuccess": "Press item added successfully",
+      "featureToggled": "Featured status updated"
     }
   },
   "common": {

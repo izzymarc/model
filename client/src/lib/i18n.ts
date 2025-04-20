@@ -208,15 +208,9 @@ const frTranslation = {
     getInTouch: "Contactez-moi",
     intro: "Pour les réservations, collaborations ou demandes, veuillez remplir le formulaire ou contacter directement mon agence.",
     followMe: "Suivez-moi",
-    email: {
-      title: "Email"
-    },
-    phone: {
-      title: "Téléphone"
-    },
-    agency: {
-      title: "Agence"
-    },
+    email: "Email",
+    phone: "Téléphone",
+    agency: "Agence",
     form: {
       name: "Nom",
       email: "Email",

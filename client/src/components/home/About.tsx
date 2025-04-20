@@ -16,9 +16,9 @@ const About = () => {
 
   const socialLinks = [
     { icon: "ri-instagram-line", url: "https://instagram.com/mirabel.udeagha", label: "Instagram" },
-    { icon: "ri-facebook-line", url: "https://facebook.com", label: "Facebook" },
-    { icon: "ri-twitter-x-line", url: "https://twitter.com", label: "Twitter" },
-    { icon: "ri-linkedin-line", url: "https://linkedin.com", label: "LinkedIn" },
+    { icon: "ri-facebook-line", url: "https://facebook.com/mirabel.udeagha", label: "Facebook" },
+    { icon: "ri-twitter-x-line", url: "https://twitter.com/mirabel.udeagha", label: "Twitter" },
+    { icon: "ri-linkedin-line", url: "https://linkedin.com/in/mirabel.udeagha", label: "LinkedIn" },
   ];
 
   return (
@@ -46,7 +46,7 @@ const About = () => {
           >
             <div className="relative">
               <img
-                src="https://i.imgur.com/U2IJ1Su.jpg"
+                src="/images/portfolio/model.jpg"
                 alt={t('about.imageAlt', 'Mirabel N. Udeagha portrait')}
                 className="w-full h-auto rounded-md shadow-md object-cover"
                 loading="eager"
@@ -62,7 +62,7 @@ const About = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {t('about.paragraph1', 'Mirabel N. Udeagha is an international fashion and editorial model based in New York. With over five years of experience in the industry, she has collaborated with renowned photographers, designers, and brands across the globe.')}
+              {t('about.paragraph1', 'Mirabel N. Udeagha is an international fashion and editorial model based in Abuja. With over five years of experience in the industry, she has collaborated with renowned photographers, designers, and brands across the globe.')}
             </motion.p>
             
             <motion.p 
