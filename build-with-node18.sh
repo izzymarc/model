@@ -45,9 +45,30 @@ export PATH="$TEMP_NODE_DIR/bin:$PATH"
 # Check Node.js version
 echo "Using Node.js $(node -v) and npm $(npm -v)"
 
-# Fix tsconfig.json first
-echo "Fixing tsconfig.json..."
+# Ensure vite.config.ts exists
+echo "Ensuring vite.config.ts exists..."
+node ensure-vite-config.js
+
+# Fix tsconfig.json and create tsconfig.node.json if needed
+echo "Fixing TypeScript configuration files..."
 node fix-tsconfig.js
+
+# Verify that tsconfig.node.json exists
+if [ ! -f "client/tsconfig.node.json" ]; then
+  echo "Creating tsconfig.node.json manually..."
+  cat > client/tsconfig.node.json << EOF
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts"]
+}
+EOF
+fi
 
 # Clean install dependencies to fix any package issues
 echo "Clean installing dependencies..."

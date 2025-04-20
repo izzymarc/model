@@ -18,6 +18,10 @@ nvm use 18.20.8
 # Install dependencies
 npm install
 
+# Run scripts to ensure all required configuration files exist
+node ensure-vite-config.js
+node fix-tsconfig.js
+
 # Build the project
 npm run build
 ```
@@ -36,18 +40,30 @@ chmod +x build-with-node18.sh
 
 This script will:
 1. Download and temporarily install Node.js v18.20.8
-2. Fix the tsconfig.json file
-3. Clean install all dependencies
-4. Build the project
-5. Clean up the temporary Node.js installation
+2. Ensure vite.config.ts exists
+3. Fix the tsconfig.json file and create tsconfig.node.json if needed
+4. Clean install all dependencies
+5. Build the project
+6. Clean up the temporary Node.js installation
+
+## Required Files
+
+The following configuration files are required:
+
+1. `client/vite.config.ts` - Vite build configuration
+2. `client/tsconfig.json` - Main TypeScript configuration
+3. `client/tsconfig.node.json` - TypeScript configuration for Vite
+
+If any of these files is missing, the build will fail. Our scripts will automatically create them if they don't exist.
 
 ## Troubleshooting
 
 If you encounter build errors:
 
-1. **tsconfig.json parsing error**:
-   Run the fix-tsconfig.js script manually:
+1. **Missing configuration files**:
+   Run the config scripts manually:
    ```bash
+   node ensure-vite-config.js
    node fix-tsconfig.js
    ```
 
