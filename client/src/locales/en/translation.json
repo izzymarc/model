@@ -26,7 +26,7 @@
     "connect": "Connect With Me",
     "emailMe": "Email Me",
     "quote": "My passion is to bring creative visions to life through fashion and editorial work.",
-    "paragraph1": "With over 7 years in the modeling industry, I've built a reputation for versatility and professionalism. My journey began in Lagos, Nigeria, before expanding to international markets including Paris, Milan, and Abuja.",
+    "paragraph1": "With over 7 years in the modeling industry, I've built a reputation for versatility and professionalism. My journey began in Lagos, Nigeria, and I've established a strong presence in Abuja's vibrant fashion scene.",
     "paragraph2": "I specialize in high-fashion editorial work, runway shows, and commercial campaigns, with a particular strength in luxury and avant-garde fashion. My background in dance gives me a unique understanding of movement and form that translates into dynamic, expressive poses.",
     "paragraph3": "I believe that great modeling is about collaboration and bringing creative visions to life through authentic expression and technical precision.",
     "height": {
@@ -214,8 +214,8 @@
   "experience": {
     "title": "Experience",
     "pfw": {
-      "title": "Paris Fashion Week",
-      "description": "Walked for Louis Vuitton and Chanel during the Spring/Summer collection shows, featured in Vogue's runway highlights."
+      "title": "Lagos Fashion Week",
+      "description": "Walked for top Nigerian designers during the Spring/Summer collection shows, featured in Vogue Africa's runway highlights."
     },
     "dior": {
       "title": "Dior Campaign",
@@ -226,12 +226,12 @@
       "description": "Featured on the cover of Elle Magazine's September issue, with a 10-page editorial spread discussing fashion and sustainability."
     },
     "nyfw": {
-      "title": "New York Fashion Week",
-      "description": "Opened for Michael Kors and closed for Marc Jacobs during NYFW, receiving significant media coverage for both appearances in Abuja and internationally."
+      "title": "Abuja Fashion Week",
+      "description": "Opened and closed for top designers during Abuja Fashion Week, receiving significant media coverage both locally and internationally."
     },
     "img": {
-      "title": "Signed with IMG Models",
-      "description": "Joined the prestigious IMG Models agency, representing their Abuja, Paris, and Milan divisions."
+      "title": "Signed with Top Agency",
+      "description": "Joined the prestigious Beth Model Management, representing their Lagos and Abuja divisions."
     }
   },
   "services": {
