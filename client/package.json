@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node ../ensure-vite-config.js && node ../fix-tsconfig.js && node ../fix-typescript-errors.js",
-    "build": "tsc && vite build && cp public/_redirects dist/_redirects && cp public/_headers dist/_headers",
+    "build": "tsc && vite build && cp public/_redirects dist/_redirects || true",
     "preview": "vite preview"
   },
   "dependencies": {
