@@ -6,16 +6,16 @@ const About = () => {
   const { t } = useTranslation();
 
   const specifications = [
-    { label: t('about.height.label', 'Height'), value: t('about.height.value', '5\'9" / 175cm') },
+    { label: t('about.height.label', 'Height'), value: t('about.height.value', '5\'9"') },
     { label: t('about.hair.label', 'Hair'), value: t('about.hair.value', 'Black') },
-    { label: t('about.eyes.label', 'Eyes'), value: t('about.eyes.value', 'Brown') },
-    { label: t('about.bust.label', 'Bust'), value: t('about.bust.value', '32" / 81cm') },
-    { label: t('about.waist.label', 'Waist'), value: t('about.waist.value', '24" / 61cm') },
-    { label: t('about.hips.label', 'Hips'), value: t('about.hips.value', '34" / 86cm') },
+    { label: t('about.eyes.label', 'Eyes'), value: t('about.eyes.value', 'Black') },
+    { label: t('about.bust.label', 'Bust'), value: t('about.bust.value', '35"') },
+    { label: t('about.waist.label', 'Waist'), value: t('about.waist.value', '26"') },
+    { label: t('about.hips.label', 'Hips'), value: t('about.hips.value', '42"') },
   ];
 
   const socialLinks = [
-    { icon: "ri-instagram-line", url: "https://instagram.com/mirabel.udeagha", label: "Instagram" },
+    { icon: "ri-instagram-line", url: "https://instagram.com/Mirabel.Udeagha", label: "Instagram" },
     { icon: "ri-facebook-line", url: "https://facebook.com/mirabel.udeagha", label: "Facebook" },
     { icon: "ri-twitter-x-line", url: "https://twitter.com/mirabel.udeagha", label: "Twitter" },
     { icon: "ri-linkedin-line", url: "https://linkedin.com/in/mirabel.udeagha", label: "LinkedIn" },

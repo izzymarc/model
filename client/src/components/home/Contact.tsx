@@ -58,8 +58,8 @@ const Contact = () => {
                 <i className="ri-mail-line text-xl mr-4"></i>
                 <div>
                   <p className="font-light text-sm uppercase tracking-wider mb-1">{t('contact.email', 'Email')}</p>
-                  <a href="mailto:contact@mirabelnudeagha.com" className="hover:underline transition-all dark:text-gray-200">
-                    contact@mirabelnudeagha.com
+                  <a href="mailto:Mirabelllaa214@gmail.com" className="hover:underline transition-all dark:text-gray-200">
+                    Mirabelllaa214@gmail.com
                   </a>
                 </div>
               </div>
@@ -68,8 +68,11 @@ const Contact = () => {
                 <i className="ri-phone-line text-xl mr-4"></i>
                 <div>
                   <p className="font-light text-sm uppercase tracking-wider mb-1">{t('contact.phone', 'Phone')}</p>
-                  <a href="tel:+1234567890" className="hover:underline transition-all dark:text-gray-200">
-                    +1 (234) 567-890
+                  <a href="tel:+2349122412017" className="hover:underline transition-all dark:text-gray-200 block">
+                    +234 912 241 2017
+                  </a>
+                  <a href="tel:+2348115311360" className="hover:underline transition-all dark:text-gray-200">
+                    +234 811 531 1360
                   </a>
                 </div>
               </div>

@@ -31,7 +31,7 @@
     "paragraph3": "I believe that great modeling is about collaboration and bringing creative visions to life through authentic expression and technical precision.",
     "height": {
       "label": "Height",
-      "value": "5'11\" / 180cm"
+      "value": "5'9\""
     },
     "hair": {
       "label": "Hair",
@@ -39,19 +39,19 @@
     },
     "eyes": {
       "label": "Eyes",
-      "value": "Brown"
+      "value": "Black"
     },
     "bust": {
       "label": "Bust",
-      "value": "32\" / 81cm"
+      "value": "35\""
     },
     "waist": {
       "label": "Waist",
-      "value": "24\" / 61cm"
+      "value": "26\""
     },
     "hips": {
       "label": "Hips",
-      "value": "34\" / 86cm"
+      "value": "42\""
     }
   },
   "portfolio": {
@@ -293,7 +293,7 @@
   "instagram": {
     "title": "Instagram",
     "subtitle": "Follow my latest work and behind-the-scenes moments",
-    "followMe": "Follow on Instagram",
+    "followMe": "Follow @mirabel.udeagha",
     "viewPost": "View on Instagram",
     "post": "Instagram post {{number}}"
   },
