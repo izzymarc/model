@@ -108,6 +108,7 @@ const Modeling = () => {
                     alt={category.title} 
                     aspectRatio="aspect-ratio-4/5"
                     className="group-hover:scale-110 transition-transform duration-700"
+                    priority={true}
                   />
                 </div>
                 <div className="pt-4 pb-2 text-center">

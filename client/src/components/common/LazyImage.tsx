@@ -112,20 +112,9 @@ const LazyImage: React.FC<LazyImageProps> = ({
           <motion.div 
             className="absolute inset-0 bg-gray-200 dark:bg-gray-700"
             initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: 1,
-              background: [
-                "hsl(0, 0%, 80%)",
-                "hsl(0, 0%, 90%)",
-                "hsl(0, 0%, 80%)"
-              ]
-            }}
+            animate={{ opacity: 0.6 }}
             exit={{ opacity: 0 }}
-            transition={{ 
-              duration: 1.5, 
-              repeat: Infinity,
-              ease: "easeInOut" 
-            }}
+            transition={{ duration: 0.8 }}
           />
         )}
       </AnimatePresence>
@@ -138,12 +127,10 @@ const LazyImage: React.FC<LazyImageProps> = ({
         style={{ objectPosition }}
         initial={{ opacity: 0 }}
         animate={{ 
-          opacity: isLoading ? 0 : 1,
-          scale: isLoading ? 1.05 : 1
+          opacity: isLoading ? 0 : 1
         }}
         transition={{ 
-          opacity: { duration: 0.5 },
-          scale: { duration: 0.7, ease: "easeOut" }
+          opacity: { duration: 1 }
         }}
         onLoad={handleLoad}
         onError={handleError}

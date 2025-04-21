@@ -136,6 +136,78 @@
       "perfume": {
         "title": "Essence Captured",
         "description": "Luxury Fragrance Campaign"
+      },
+      "redTop": {
+        "title": "Bold Statement",
+        "description": "Contemporary Editorial Series"
+      },
+      "blackDress": {
+        "title": "Midnight Allure",
+        "description": "High Fashion Editorial"
+      },
+      "blackTop": {
+        "title": "Elegant Contrast",
+        "description": "Modern Beauty Portrait"
+      },
+      "naturalBeauty": {
+        "title": "Authentic Glow",
+        "description": "Natural Beauty Campaign"
+      },
+      "patternDress": {
+        "title": "Pattern Play",
+        "description": "Contemporary Fashion Story"
+      },
+      "casualLook": {
+        "title": "Effortless Style",
+        "description": "Casual Commercial Series"
+      },
+      "bluePattern": {
+        "title": "Azure Patterns",
+        "description": "Modern Commercial Look"
+      },
+      "headShot": {
+        "title": "Luminous Portrait",
+        "description": "Professional Headshot Series"
+      },
+      "naturalPortrait": {
+        "title": "Authentic Essence",
+        "description": "Natural Light Portrait Study"
+      },
+      "beautyCloseup": {
+        "title": "Luminous Detail",
+        "description": "Beauty Close-up Series"
+      },
+      "beautyProfile": {
+        "title": "Profile Elegance",
+        "description": "Classic Beauty Profile"
+      },
+      "editorialCasual": {
+        "title": "Relaxed Editorial",
+        "description": "Contemporary Casual Series"
+      },
+      "editorialEvening": {
+        "title": "Evening Allure",
+        "description": "Sophisticated Editorial Collection"
+      },
+      "beautyMinimal": {
+        "title": "Minimalist Beauty",
+        "description": "Clean Aesthetic Portrait"
+      },
+      "commercialCasual2": {
+        "title": "Urban Casual",
+        "description": "Modern Lifestyle Campaign"
+      },
+      "commercialPattern2": {
+        "title": "Pattern Fusion",
+        "description": "Contemporary Print Collection"
+      },
+      "runwayEvening": {
+        "title": "Runway Elegance",
+        "description": "Evening Wear Showcase"
+      },
+      "portraitElegant": {
+        "title": "Refined Portrait",
+        "description": "Elegant Beauty Study"
       }
     }
   },
