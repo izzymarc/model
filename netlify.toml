@@ -2,11 +2,19 @@
   command = "npm run build"
   publish = "client/dist"
 
-# Handle routing for SPA
+# Handle routing for SPA - This is the most important part for fixing the 404 issues
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = true
+
+# Add specific route handling for blog posts
+[[redirects]]
+  from = "/blog/*"
+  to = "/index.html"
+  status = 200
+  force = true
 
 # Environment settings
 [build.environment]
