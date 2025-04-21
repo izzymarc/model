@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { Suspense, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Toaster } from "./components/ui/toaster";
@@ -58,21 +58,27 @@ const InitialLoader = () => {
   );
 };
 
+// Define a base path for our router
+const basePath = "";
+
 function Router() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/about" component={About} />
-        <Route path="/portfolio" component={Portfolio} />
-        <Route path="/experience" component={Experience} />
-        <Route path="/press" component={Press} />
-        <Route path="/contact" component={Contact} />
-        <Route path="/blog" component={Blog} />
-        <Route path="/admin" component={Admin} />
-        <Route component={NotFound} />
-      </Switch>
-    </Suspense>
+    <WouterRouter base={basePath}>
+      <Suspense fallback={<LoadingFallback />}>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/about" component={About} />
+          <Route path="/portfolio" component={Portfolio} />
+          <Route path="/experience" component={Experience} />
+          <Route path="/press" component={Press} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/blog" component={Blog} />
+          <Route path="/blog/:slug" component={Blog} />
+          <Route path="/admin" component={Admin} />
+          <Route component={NotFound} />
+        </Switch>
+      </Suspense>
+    </WouterRouter>
   );
 }
 

@@ -118,12 +118,12 @@ const Instagram: React.FC = () => {
           className="text-center mt-12"
         >
           <a
-            href="https://instagram.com"
+            href="https://instagram.com/mirabel.udeagha"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-full hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300 transform hover:scale-105 shadow-md"
           >
-            {t('instagram.followMe', 'Follow Me')}
+            {t('instagram.followMe', 'Follow @mirabel.udeagha')}
           </a>
         </motion.div>
       </div>

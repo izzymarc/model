@@ -9,6 +9,11 @@ export default defineConfig({
     port: 3000,
     strictPort: false,
     host: true,
+    historyApiFallback: true
+  },
+  preview: {
+    host: true,
+    port: 4173
   },
   resolve: {
     alias: {
