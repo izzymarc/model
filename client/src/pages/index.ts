@@ -7,4 +7,4 @@ export { default as Press } from './Press';
 export { default as Contact } from './Contact';
 export { default as Blog } from './Blog';
 export { default as Admin } from './Admin';
-export { default as NotFound } from './not-found'; 
+export { default as NotFound } from './NotFound'; 
