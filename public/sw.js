@@ -16,7 +16,6 @@ const STATIC_CACHE_URLS = [
   '/assets/index-*.css',
   '/assets/index-*.js',
   // Core images
-  '/images/hero.jpeg',
   '/images/about.jpeg',
   '/images/og-image.jpg',
   // Instagram images
@@ -128,7 +127,7 @@ self.addEventListener('fetch', event => {
             
             // For images, serve a placeholder
             if (event.request.url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-              return caches.match('/placeholder-image.jpg');
+              return caches.match('/images/fallback/default.jpg');
             }
             
             // Otherwise return error

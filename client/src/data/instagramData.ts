@@ -53,3 +53,5 @@ export const instagramPosts: InstagramPost[] = [
     date: '2024-02-15'
   }
 ];
+
+export default instagramPosts;

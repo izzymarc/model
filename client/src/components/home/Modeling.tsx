@@ -37,7 +37,7 @@ const modelingCategories = [
   {
     id: "runway",
     title: "Runway",
-    imageSrc: "/images/modeling/runway.jpg",
+    imageSrc: "/images/me/runway-evening.jpg",
     link: "/portfolio/runway"
   }
 ];

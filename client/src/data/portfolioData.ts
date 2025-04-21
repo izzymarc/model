@@ -51,7 +51,7 @@ export const portfolioData: PortfolioItem[] = [
     titleKey: 'portfolio.items.reddress.title',
     descriptionKey: 'portfolio.items.reddress.description',
     category: 'runway',
-    image: '/images/me/runway-1.jpg',
+    image: '/images/me/runway-evening.jpg',
     year: 2023,
     tags: ['fashion', 'runway', 'editorial']
   },
